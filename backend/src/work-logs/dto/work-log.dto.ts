@@ -2,12 +2,12 @@ export class CreateWorkLogDto {
     workerId: number;
     projectId: number;
     date: string;
-    hours: number;
+    days: number;
     description?: string;
 }
 
 export class UpdateWorkLogDto {
-    hours?: number;
+    days?: number;
     description?: string;
     date?: string;
 }

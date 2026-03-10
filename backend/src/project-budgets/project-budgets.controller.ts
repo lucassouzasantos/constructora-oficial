@@ -9,6 +9,7 @@ export class ProjectBudgetsController {
 
   @Post()
   create(@Body() createProjectBudgetDto: CreateProjectBudgetDto) {
+    console.log('Controller received create request', createProjectBudgetDto);
     return this.projectBudgetsService.create(createProjectBudgetDto);
   }
 

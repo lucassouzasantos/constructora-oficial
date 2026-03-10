@@ -22,6 +22,7 @@ export default function ReportsPage() {
     const [transactions, setTransactions] = useState<Transaction[]>([]);
     const [monthlyData, setMonthlyData] = useState<MonthlyData[]>([]);
     const [loading, setLoading] = useState(true);
+    const [inventoryTotal, setInventoryTotal] = useState(0);
 
     // Filter State
     const [dateRange, setDateRange] = useState<'1M' | '3M' | '6M' | '9M' | '12M' | 'CUSTOM'>('6M');
@@ -30,6 +31,7 @@ export default function ReportsPage() {
 
     useEffect(() => {
         fetchTransactions();
+        fetchInventory();
     }, []);
 
     useEffect(() => {
@@ -47,6 +49,17 @@ export default function ReportsPage() {
             console.error('Error fetching data:', error);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const fetchInventory = async () => {
+        try {
+            const response = await fetch(`http://localhost:3000/inventory?t=${new Date().getTime()}`);
+            const data = await response.json();
+            const total = data.reduce((acc: number, item: any) => acc + ((Number(item.quantity) || 0) * (Number(item.unitValue) || 0)), 0);
+            setInventoryTotal(total);
+        } catch (error) {
+            console.error('Error fetching inventory:', error);
         }
     };
 
@@ -120,7 +133,12 @@ export default function ReportsPage() {
     return (
         <div className="space-y-8">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-                <h2 className="text-2xl font-bold text-slate-800">Relatórios Financeiros</h2>
+                <div className="flex items-center gap-4">
+                    <h2 className="text-2xl font-bold text-slate-800">Relatórios Financeiros</h2>
+                    <div className="hidden sm:flex items-center gap-2 bg-orange-50 text-orange-700 px-4 py-1.5 rounded-full border border-orange-200 text-sm font-medium">
+                        Capital em Estoque: {formatCurrency(inventoryTotal)}
+                    </div>
+                </div>
 
                 {/* Filters */}
                 <div className="flex flex-wrap items-center gap-2 bg-white p-1 rounded-lg border border-slate-200">

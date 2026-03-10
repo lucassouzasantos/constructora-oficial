@@ -26,19 +26,20 @@ interface Project {
     stages?: ProjectStage[];
     totalArea?: number;
     salesValue?: number;
+    status: string;
 }
 
 interface Worker {
     id: number;
     name: string;
     role: string;
-    hourlyRate: number;
+    dailyRate: number;
 }
 
 interface WorkLog {
     id: number;
     date: string;
-    hours: number;
+    days: number;
     description: string;
     worker: Worker;
     amount: number; // calculated cost
@@ -64,7 +65,7 @@ export default function ProjectDetailsPage() {
     const [workLogFormData, setWorkLogFormData] = useState({
         workerId: '',
         date: new Date().toISOString().split('T')[0],
-        hours: '',
+        days: '',
         description: ''
     });
 
@@ -208,7 +209,7 @@ export default function ProjectDetailsPage() {
                     projectId: Number(id),
                     workerId: Number(workLogFormData.workerId),
                     date: new Date(workLogFormData.date).toISOString(),
-                    hours: Number(workLogFormData.hours),
+                    days: Number(workLogFormData.days),
                     description: workLogFormData.description
                 })
             });
@@ -216,7 +217,7 @@ export default function ProjectDetailsPage() {
             setWorkLogFormData({
                 workerId: '',
                 date: new Date().toISOString().split('T')[0],
-                hours: '',
+                days: '',
                 description: ''
             });
             fetchWorkLogs();
@@ -412,7 +413,7 @@ export default function ProjectDetailsPage() {
 
     const calculateFinancials = () => {
         const totalExpenses = expenses.reduce((acc, curr) => acc + Number(curr.amount), 0);
-        const totalLabor = workLogs.reduce((acc, curr) => acc + (Number(curr.hours) * Number(curr.worker.hourlyRate)), 0);
+        const totalLabor = workLogs.reduce((acc, curr) => acc + (Number(curr.days) * Number(curr.worker.dailyRate)), 0);
         const totalCost = totalExpenses + totalLabor;
 
         const totalBudget = budgets.reduce((acc, curr) => acc + Number(curr.amount), 0);
@@ -424,27 +425,62 @@ export default function ProjectDetailsPage() {
 
         const totalArea = Number(project?.totalArea || 0);
         const costPerM2 = totalArea > 0 ? totalCost / totalArea : 0;
+        const predictedProfit = salesValue - totalBudget;
+        const predictedMargin = salesValue > 0 ? (predictedProfit / salesValue) * 100 : 0;
 
-        return { totalCost, totalBudget, budgetDeviation, margin, profit, costPerM2, salesValue, totalArea };
+        return { totalCost, totalBudget, budgetDeviation, margin, profit, costPerM2, salesValue, totalArea, predictedProfit, predictedMargin };
     };
 
     const financials = calculateFinancials();
+
+    const handleFinishProject = async () => {
+        if (!confirm('Tem certeza que deseja finalizar esta obra? Não será possível reverter essa ação.')) return;
+        try {
+            const response = await fetch(`http://localhost:3000/projects/${id}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status: 'FINISHED' })
+            });
+            if (response.ok) {
+                fetchProject();
+            }
+        } catch (error) {
+            console.error('Error finishing project:', error);
+        }
+    };
 
     if (!project) return <div>Carregando...</div>;
 
     return (
         <div className="space-y-6">
             {/* Header */}
-            <div className="flex items-center gap-4">
-                <Link to="/projects" className="p-2 hover:bg-slate-100 rounded-full transition-colors">
-                    <ArrowLeft className="w-5 h-5 text-slate-500" />
-                </Link>
-                <div>
-                    <h2 className="text-2xl font-bold text-slate-800">{project.name}</h2>
-                    <p className="text-slate-500 text-sm">
-                        {project.location} • {project.customer?.name}
-                    </p>
+            <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                    <Link to="/projects" className="p-2 hover:bg-slate-100 rounded-full transition-colors">
+                        <ArrowLeft className="w-5 h-5 text-slate-500" />
+                    </Link>
+                    <div>
+                        <div className="flex items-center gap-3">
+                            <h2 className="text-2xl font-bold text-slate-800">{project.name}</h2>
+                            {project.status === 'FINISHED' && (
+                                <span className="px-2 py-1 bg-green-100 text-green-700 text-xs font-bold rounded-full border border-green-200 uppercase tracking-wide">
+                                    Finalizada
+                                </span>
+                            )}
+                        </div>
+                        <p className="text-slate-500 text-sm mt-1">
+                            {project.location} • {project.customer?.name}
+                        </p>
+                    </div>
                 </div>
+                {project.status !== 'FINISHED' && (
+                    <button
+                        onClick={handleFinishProject}
+                        className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 font-medium transition-colors shadow-sm shadow-green-500/20"
+                    >
+                        <CheckCircle className="w-5 h-5" /> Finalizar Obra
+                    </button>
+                )}
             </div>
 
 
@@ -452,16 +488,35 @@ export default function ProjectDetailsPage() {
             {/* Dashboard Section */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
-                    <p className="text-sm text-slate-500 mb-1">Margem da Obra</p>
-                    <div className="flex items-center gap-2">
-                        <span className={`text-2xl font-bold ${financials.margin >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                            {financials.margin.toFixed(1)}%
+                    <p className="text-sm text-slate-500 mb-1">Valor do Contrato</p>
+                    <div className="flex items-center gap-2 mb-2">
+                        <span className="text-2xl font-bold text-slate-800">
+                            {formatCurrency(financials.salesValue)}
                         </span>
-                        {financials.salesValue > 0 && (
-                            <span className="text-xs text-slate-400">
-                                ({formatCurrency(financials.profit)})
-                            </span>
-                        )}
+                    </div>
+                    <div className="pt-2 border-t border-slate-100 flex flex-col gap-2">
+                        <div>
+                            <p className="text-xs text-slate-500 mb-1">Lucro Previsto</p>
+                            <div className="flex items-center gap-2">
+                                <span className={`text-sm font-bold ${financials.predictedProfit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                                    {formatCurrency(financials.predictedProfit)}
+                                </span>
+                                <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded-md ${financials.predictedMargin >= 0 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                                    {financials.predictedMargin.toFixed(1)}%
+                                </span>
+                            </div>
+                        </div>
+                        <div>
+                            <p className="text-xs text-slate-500 mb-1">Saldo Restante Atual (Margem)</p>
+                            <div className="flex items-center gap-2">
+                                <span className={`text-lg font-bold ${financials.profit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                                    {formatCurrency(financials.profit)}
+                                </span>
+                                <span className={`text-xs font-medium px-2 py-0.5 rounded-md ${financials.margin >= 0 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                                    {financials.margin.toFixed(1)}%
+                                </span>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
@@ -747,22 +802,22 @@ export default function ProjectDetailsPage() {
                                 onClick={() => setIsWorkLogModalOpen(true)}
                                 className="bg-orange-500 hover:bg-orange-600 text-white px-3 py-1.5 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors"
                             >
-                                <Plus className="w-4 h-4" /> Registrar Horas
+                                <Plus className="w-4 h-4" /> Registrar Dias
                             </button>
                         </div>
 
                         {/* Summary Cards */}
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
-                                <p className="text-sm text-slate-500 mb-1">Total de Horas</p>
+                                <p className="text-sm text-slate-500 mb-1">Total de Dias</p>
                                 <p className="text-2xl font-bold text-slate-800">
-                                    {workLogs.reduce((acc, curr) => acc + Number(curr.hours), 0)}h
+                                    {workLogs.reduce((acc, curr) => acc + Number(curr.days), 0)} dias
                                 </p>
                             </div>
                             <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
                                 <p className="text-sm text-slate-500 mb-1">Custo Total</p>
                                 <p className="text-2xl font-bold text-slate-800">
-                                    {formatCurrency(workLogs.reduce((acc, curr) => acc + (Number(curr.hours) * Number(curr.worker.hourlyRate)), 0))}
+                                    {formatCurrency(workLogs.reduce((acc, curr) => acc + (Number(curr.days) * Number(curr.worker.dailyRate)), 0))}
                                 </p>
                             </div>
                         </div>
@@ -773,8 +828,8 @@ export default function ProjectDetailsPage() {
                                     <tr>
                                         <th className="px-6 py-4 font-semibold text-slate-700 text-sm">Data</th>
                                         <th className="px-6 py-4 font-semibold text-slate-700 text-sm">Colaborador</th>
-                                        <th className="px-6 py-4 font-semibold text-slate-700 text-sm">Horas</th>
-                                        <th className="px-6 py-4 font-semibold text-slate-700 text-sm">Custo/Hora</th>
+                                        <th className="px-6 py-4 font-semibold text-slate-700 text-sm">Dias</th>
+                                        <th className="px-6 py-4 font-semibold text-slate-700 text-sm">Custo/Dia</th>
                                         <th className="px-6 py-4 font-semibold text-slate-700 text-sm">Total</th>
                                         <th className="px-6 py-4 font-semibold text-slate-700 text-sm">Descrição</th>
                                         <th className="px-6 py-4 font-semibold text-slate-700 text-sm text-right">Ações</th>
@@ -791,13 +846,13 @@ export default function ProjectDetailsPage() {
                                                 <span className="block text-xs text-slate-400 font-normal">{log.worker.role}</span>
                                             </td>
                                             <td className="px-6 py-4 text-sm text-slate-600">
-                                                {log.hours}h
+                                                {log.days} d
                                             </td>
                                             <td className="px-6 py-4 text-sm text-slate-600">
-                                                {formatCurrency(log.worker.hourlyRate)}
+                                                {formatCurrency(log.worker.dailyRate)}
                                             </td>
                                             <td className="px-6 py-4 text-sm font-bold text-slate-900">
-                                                {formatCurrency(Number(log.hours) * Number(log.worker.hourlyRate))}
+                                                {formatCurrency(Number(log.days) * Number(log.worker.dailyRate))}
                                             </td>
                                             <td className="px-6 py-4 text-sm text-slate-600">
                                                 {log.description || '-'}
@@ -815,7 +870,7 @@ export default function ProjectDetailsPage() {
                                     {workLogs.length === 0 && (
                                         <tr>
                                             <td colSpan={7} className="px-6 py-8 text-center text-slate-400">
-                                                Nenhum lançamento de horas.
+                                                Nenhum lançamento de dias de trabalho.
                                             </td>
                                         </tr>
                                     )}
@@ -901,7 +956,7 @@ export default function ProjectDetailsPage() {
 
                                             // Include internal labor cost in MÃO_DE_OBRA
                                             if (cat === 'MÃO_DE_OBRA') {
-                                                const internalLaborCost = workLogs.reduce((acc, curr) => acc + (Number(curr.hours) * Number(curr.worker.hourlyRate)), 0);
+                                                const internalLaborCost = workLogs.reduce((acc, curr) => acc + (Number(curr.days) * Number(curr.worker.dailyRate)), 0);
                                                 total += internalLaborCost;
                                             }
 
@@ -936,7 +991,7 @@ export default function ProjectDetailsPage() {
                                             <span className="font-bold text-slate-900 text-lg">
                                                 {formatCurrency(
                                                     expenses.filter(e => e.type === 'EXPENSE').reduce((acc, curr) => acc + Number(curr.amount), 0) +
-                                                    workLogs.reduce((acc, curr) => acc + (Number(curr.hours) * Number(curr.worker.hourlyRate)), 0)
+                                                    workLogs.reduce((acc, curr) => acc + (Number(curr.days) * Number(curr.worker.dailyRate)), 0)
                                                 )}
                                             </span>
                                         </div>
@@ -1041,7 +1096,6 @@ export default function ProjectDetailsPage() {
                                 <div>
                                     <label className="block text-sm font-medium mb-1">Valor Previsto (₲)</label>
                                     <CurrencyInput
-                                        required
                                         className="w-full border rounded-lg p-2 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all"
                                         value={budgetFormData.amount}
                                         onValueChange={val => setBudgetFormData({ ...budgetFormData, amount: val })}
@@ -1115,7 +1169,6 @@ export default function ProjectDetailsPage() {
                                 <div>
                                     <label className="block text-sm font-medium mb-1">Valor Total (₲)</label>
                                     <CurrencyInput
-                                        required
                                         className="w-full border rounded-lg p-2 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all"
                                         value={financeFormData.amount}
                                         onValueChange={val => setFinanceFormData({ ...financeFormData, amount: val })}
@@ -1174,7 +1227,7 @@ export default function ProjectDetailsPage() {
                     <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
                         <div className="bg-white rounded-xl w-full max-w-sm shadow-2xl">
                             <div className="px-6 py-4 border-b border-slate-100 flex justify-between items-center">
-                                <h3 className="font-semibold text-lg text-slate-800">Registrar Horas</h3>
+                                <h3 className="font-semibold text-lg text-slate-800">Registrar Dias</h3>
                                 <button onClick={() => setIsWorkLogModalOpen(false)} className="text-slate-400 hover:text-slate-600">
                                     <X className="w-5 h-5" />
                                 </button>
@@ -1191,7 +1244,7 @@ export default function ProjectDetailsPage() {
                                         <option value="">Selecione...</option>
                                         {workers.map(worker => (
                                             <option key={worker.id} value={worker.id}>
-                                                {worker.name} ({formatCurrency(worker.hourlyRate)}/h)
+                                                {worker.name} ({formatCurrency(worker.dailyRate)}/dia)
                                             </option>
                                         ))}
                                     </select>
@@ -1207,14 +1260,14 @@ export default function ProjectDetailsPage() {
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium mb-1">Horas Trabalhadas</label>
+                                    <label className="block text-sm font-medium mb-1">Dias Trabalhados</label>
                                     <input
                                         required
                                         type="number"
                                         step="0.5"
                                         className="w-full border rounded-lg p-2 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 outline-none transition-all"
-                                        value={workLogFormData.hours}
-                                        onChange={e => setWorkLogFormData({ ...workLogFormData, hours: e.target.value })}
+                                        value={workLogFormData.days}
+                                        onChange={e => setWorkLogFormData({ ...workLogFormData, days: e.target.value })}
                                     />
                                 </div>
                                 <div>
@@ -1230,7 +1283,7 @@ export default function ProjectDetailsPage() {
                                     type="submit"
                                     className="w-full bg-orange-500 text-white py-2 rounded-lg font-medium hover:bg-orange-600 transition-colors shadow-sm shadow-orange-500/20"
                                 >
-                                    Registrar Horas
+                                    Registrar Dias
                                 </button>
                             </form>
                         </div>

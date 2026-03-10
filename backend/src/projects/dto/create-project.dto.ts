@@ -31,4 +31,8 @@ export class CreateProjectDto {
     @IsOptional()
     @IsNumber()
     customerId?: number;
+
+    @IsOptional()
+    @IsString()
+    status?: string;
 }

@@ -10,7 +10,7 @@ export class WorkersService {
         return this.prisma.worker.create({
             data: {
                 ...data,
-                hourlyRate: Number(data.hourlyRate),
+                dailyRate: Number(data.dailyRate),
             },
         });
     }
@@ -33,7 +33,7 @@ export class WorkersService {
             where: { id },
             data: {
                 ...data,
-                hourlyRate: data.hourlyRate ? Number(data.hourlyRate) : undefined,
+                dailyRate: data.dailyRate ? Number(data.dailyRate) : undefined,
             },
         });
     }

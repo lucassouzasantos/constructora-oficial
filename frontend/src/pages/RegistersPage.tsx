@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, Search, Pencil, Trash2, Building, Users, AlertCircle } from 'lucide-react';
+import { Pencil, Search, Plus, Building, Users, Trash2 } from 'lucide-react';
 
 interface Supplier {
     id: number;
@@ -16,13 +16,15 @@ interface Customer {
     ci: string;
     phone: string;
     email: string;
+    city?: string;
 }
 
 interface RegistersPageProps {
-    type?: 'ALL' | 'SUPPLIERS' | 'CUSTOMERS';
+    type?: 'ALL' | 'CUSTOMERS' | 'SUPPLIERS';
+    hideHeader?: boolean;
 }
 
-export default function RegistersPage({ type = 'ALL' }: RegistersPageProps) {
+export default function RegistersPage({ type = 'ALL', hideHeader }: RegistersPageProps) {
     const [activeTab, setActiveTab] = useState<'SUPPLIERS' | 'CUSTOMERS'>(
         type === 'CUSTOMERS' ? 'CUSTOMERS' : 'SUPPLIERS'
     );
@@ -170,6 +172,7 @@ export default function RegistersPage({ type = 'ALL' }: RegistersPageProps) {
                             <tr>
                                 <th className="px-6 py-3 font-medium">Nome</th>
                                 <th className="px-6 py-3 font-medium">{activeTab === 'SUPPLIERS' ? 'RUC' : 'CI'}</th>
+                                {activeTab === 'CUSTOMERS' && <th className="px-6 py-3 font-medium">Cidade</th>}
                                 <th className="px-6 py-3 font-medium">Email</th>
                                 <th className="px-6 py-3 font-medium">Telefone</th>
                                 {activeTab === 'SUPPLIERS' && <th className="px-6 py-3 font-medium">Categoria</th>}
@@ -181,6 +184,7 @@ export default function RegistersPage({ type = 'ALL' }: RegistersPageProps) {
                                 <tr key={item.id} className="border-b border-slate-50 hover:bg-slate-50/50 transition-colors">
                                     <td className="px-6 py-4 font-medium text-slate-800">{item.name}</td>
                                     <td className="px-6 py-4 text-slate-500">{activeTab === 'SUPPLIERS' ? item.ruc : item.ci}</td>
+                                    {activeTab === 'CUSTOMERS' && <td className="px-6 py-4 text-slate-500">{item.city || '-'}</td>}
                                     <td className="px-6 py-4 text-slate-500">{item.email}</td>
                                     <td className="px-6 py-4 text-slate-500">{item.phone}</td>
                                     {activeTab === 'SUPPLIERS' && <td className="px-6 py-4 text-slate-500">{item.category}</td>}
@@ -256,6 +260,17 @@ export default function RegistersPage({ type = 'ALL' }: RegistersPageProps) {
                                         onChange={e => setFormData({ ...formData, category: e.target.value })}
                                         className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-orange-500 outline-none"
                                         placeholder="Ex: Material de Construção"
+                                    />
+                                </div>
+                            )}
+                            {activeTab === 'CUSTOMERS' && (
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-700 mb-1">Cidade</label>
+                                    <input
+                                        value={formData.city || ''}
+                                        onChange={e => setFormData({ ...formData, city: e.target.value })}
+                                        className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-orange-500 outline-none"
+                                        placeholder="Ex: Asunción"
                                     />
                                 </div>
                             )}

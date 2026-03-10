@@ -12,7 +12,7 @@ export class WorkLogsService {
                 worker: { connect: { id: Number(data.workerId) } },
                 project: { connect: { id: Number(data.projectId) } },
                 date: new Date(data.date),
-                hours: Number(data.hours),
+                days: Number(data.days),
                 description: data.description,
             },
             include: { worker: true },
@@ -34,7 +34,7 @@ export class WorkLogsService {
         });
 
         return logs.reduce((total, log) => {
-            return total + (Number(log.hours) * Number(log.worker.hourlyRate));
+            return total + (Number(log.days) * Number(log.worker.dailyRate));
         }, 0);
     }
 

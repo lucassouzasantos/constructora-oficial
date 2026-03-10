@@ -20,6 +20,7 @@ export default function Layout() {
         { path: '/supplies', icon: Package, label: 'Suprimentos' },
         { path: '/team', icon: Users, label: 'Equipe' },
         { path: '/contracts', icon: FileText, label: 'Contratos' },
+        { path: '/customers', icon: Contact, label: 'Clientes' },
         { path: '/reports', icon: PieChart, label: 'Relatórios' },
         { path: '/admin', icon: Settings, label: 'Administração' },
     ];

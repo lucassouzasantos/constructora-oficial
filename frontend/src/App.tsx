@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { Toaster } from 'sonner';
 import Layout from './components/Layout';
 import Dashboard from './pages/Dashboard';
 import ProjectsPage from './pages/ProjectsPage';
@@ -8,6 +9,7 @@ import RegistersPage from './pages/RegistersPage';
 import ReportsPage from './pages/ReportsPage';
 import TeamPage from './pages/TeamPage';
 import SuppliesPage from './pages/SuppliesPage';
+import CustomersPage from './pages/CustomersPage'; // Added this line
 import ContractsPage from './pages/ContractsPage';
 import AdminPage from './pages/AdminPage';
 import LoginPage from './pages/LoginPage';
@@ -16,6 +18,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 function App() {
   return (
     <BrowserRouter>
+      <Toaster position="top-right" richColors />
       <Routes>
         <Route path="/login" element={<LoginPage />} />
 
@@ -30,6 +33,7 @@ function App() {
             <Route path="/registers" element={<RegistersPage />} />
             <Route path="/supplies" element={<SuppliesPage />} />
             <Route path="/contracts" element={<ContractsPage />} />
+            <Route path="/customers" element={<CustomersPage />} />
             <Route path="/admin" element={<AdminPage />} />
             <Route path="/reports" element={<ReportsPage />} />
           </Route>

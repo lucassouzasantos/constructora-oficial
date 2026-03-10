@@ -1,14 +1,14 @@
 export class CreateWorkerDto {
     name: string;
     role?: string;
-    hourlyRate: number;
+    dailyRate: number;
     phone?: string;
 }
 
 export class UpdateWorkerDto {
     name?: string;
     role?: string;
-    hourlyRate?: number;
+    dailyRate?: number;
     phone?: string;
     active?: boolean;
 }

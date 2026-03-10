@@ -7,15 +7,28 @@ import { PrismaService } from '../prisma.service';
 export class ProjectBudgetsService {
   constructor(private prisma: PrismaService) { }
 
-  create(createProjectBudgetDto: CreateProjectBudgetDto) {
-    return this.prisma.projectBudget.create({
-      data: {
-        category: createProjectBudgetDto.category,
-        amount: Number(createProjectBudgetDto.amount),
-        description: createProjectBudgetDto.description,
-        projectId: Number(createProjectBudgetDto.projectId),
-      },
-    });
+  async create(createProjectBudgetDto: CreateProjectBudgetDto) {
+    console.log('Creating budget payload:', createProjectBudgetDto);
+
+    const amount = typeof createProjectBudgetDto.amount === 'string'
+      ? Number(createProjectBudgetDto.amount.replace(/\./g, '').replace(/,/g, '.'))
+      : Number(createProjectBudgetDto.amount);
+
+    console.log('Parsed amount:', amount);
+
+    try {
+      return await this.prisma.projectBudget.create({
+        data: {
+          category: createProjectBudgetDto.category,
+          amount: amount,
+          description: createProjectBudgetDto.description,
+          projectId: Number(createProjectBudgetDto.projectId),
+        },
+      });
+    } catch (error) {
+      console.error('Error creating project budget:', error);
+      throw error;
+    }
   }
 
   findAll(projectId?: number) {

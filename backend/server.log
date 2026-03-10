@@ -1,0 +1,78 @@
+[2026-02-20T20:02:03.008Z] GET /uploads/file-1771617716599-890068083.pdf - Status: 404 - Error: {"message":"Cannot GET /uploads/file-1771617716599-890068083.pdf","error":"Not Found","statusCode":404}
+Stack: NotFoundException: Cannot GET /uploads/file-1771617716599-890068083.pdf
+    at callback (C:\Users\lucassouza\.gemini\antigravity\playground\fusion-ring\backend\node_modules\@nestjs\core\router\routes-resolver.js:77:19)
+    at C:\Users\lucassouza\.gemini\antigravity\playground\fusion-ring\backend\node_modules\@nestjs\core\router\router-proxy.js:9:23
+    at Layer.handleRequest (C:\Users\lucassouza\.gemini\antigravity\playground\fusion-ring\backend\node_modules\router\lib\layer.js:152:17)
+    at trimPrefix (C:\Users\lucassouza\.gemini\antigravity\playground\fusion-ring\backend\node_modules\router\index.js:342:13)
+    at C:\Users\lucassouza\.gemini\antigravity\playground\fusion-ring\backend\node_modules\router\index.js:297:9
+    at processParams (C:\Users\lucassouza\.gemini\antigravity\playground\fusion-ring\backend\node_modules\router\index.js:582:12)
+    at next (C:\Users\lucassouza\.gemini\antigravity\playground\fusion-ring\backend\node_modules\router\index.js:291:5)
+    at read (C:\Users\lucassouza\.gemini\antigravity\playground\fusion-ring\backend\node_modules\body-parser\lib\read.js:53:5)
+    at urlencodedParser (C:\Users\lucassouza\.gemini\antigravity\playground\fusion-ring\backend\node_modules\body-parser\lib\types\urlencoded.js:57:5)
+    at Layer.handleRequest (C:\Users\lucassouza\.gemini\antigravity\playground\fusion-ring\backend\node_modules\router\lib\layer.js:152:17)
+
+[2026-02-20T20:02:03.426Z] GET /favicon.ico - Status: 404 - Error: {"message":"Cannot GET /favicon.ico","error":"Not Found","statusCode":404}
+Stack: NotFoundException: Cannot GET /favicon.ico
+    at callback (C:\Users\lucassouza\.gemini\antigravity\playground\fusion-ring\backend\node_modules\@nestjs\core\router\routes-resolver.js:77:19)
+    at C:\Users\lucassouza\.gemini\antigravity\playground\fusion-ring\backend\node_modules\@nestjs\core\router\router-proxy.js:9:23
+    at Layer.handleRequest (C:\Users\lucassouza\.gemini\antigravity\playground\fusion-ring\backend\node_modules\router\lib\layer.js:152:17)
+    at trimPrefix (C:\Users\lucassouza\.gemini\antigravity\playground\fusion-ring\backend\node_modules\router\index.js:342:13)
+    at C:\Users\lucassouza\.gemini\antigravity\playground\fusion-ring\backend\node_modules\router\index.js:297:9
+    at processParams (C:\Users\lucassouza\.gemini\antigravity\playground\fusion-ring\backend\node_modules\router\index.js:582:12)
+    at next (C:\Users\lucassouza\.gemini\antigravity\playground\fusion-ring\backend\node_modules\router\index.js:291:5)
+    at read (C:\Users\lucassouza\.gemini\antigravity\playground\fusion-ring\backend\node_modules\body-parser\lib\read.js:53:5)
+    at urlencodedParser (C:\Users\lucassouza\.gemini\antigravity\playground\fusion-ring\backend\node_modules\body-parser\lib\types\urlencoded.js:57:5)
+    at Layer.handleRequest (C:\Users\lucassouza\.gemini\antigravity\playground\fusion-ring\backend\node_modules\router\lib\layer.js:152:17)
+
+[2026-02-20T20:06:09.288Z] GET /uploads/file-1771617716599-890068083.pdf - Status: 404 - Error: {"message":"Cannot GET /uploads/file-1771617716599-890068083.pdf","error":"Not Found","statusCode":404}
+Stack: NotFoundException: Cannot GET /uploads/file-1771617716599-890068083.pdf
+    at callback (C:\Users\lucassouza\.gemini\antigravity\playground\fusion-ring\backend\node_modules\@nestjs\core\router\routes-resolver.js:77:19)
+    at C:\Users\lucassouza\.gemini\antigravity\playground\fusion-ring\backend\node_modules\@nestjs\core\router\router-proxy.js:9:23
+    at Layer.handleRequest (C:\Users\lucassouza\.gemini\antigravity\playground\fusion-ring\backend\node_modules\router\lib\layer.js:152:17)
+    at trimPrefix (C:\Users\lucassouza\.gemini\antigravity\playground\fusion-ring\backend\node_modules\router\index.js:342:13)
+    at C:\Users\lucassouza\.gemini\antigravity\playground\fusion-ring\backend\node_modules\router\index.js:297:9
+    at processParams (C:\Users\lucassouza\.gemini\antigravity\playground\fusion-ring\backend\node_modules\router\index.js:582:12)
+    at next (C:\Users\lucassouza\.gemini\antigravity\playground\fusion-ring\backend\node_modules\router\index.js:291:5)
+    at read (C:\Users\lucassouza\.gemini\antigravity\playground\fusion-ring\backend\node_modules\body-parser\lib\read.js:53:5)
+    at urlencodedParser (C:\Users\lucassouza\.gemini\antigravity\playground\fusion-ring\backend\node_modules\body-parser\lib\types\urlencoded.js:57:5)
+    at Layer.handleRequest (C:\Users\lucassouza\.gemini\antigravity\playground\fusion-ring\backend\node_modules\router\lib\layer.js:152:17)
+
+[2026-02-20T20:06:13.494Z] GET /uploads/file-1771617716599-890068083.pdf - Status: 404 - Error: {"message":"Cannot GET /uploads/file-1771617716599-890068083.pdf","error":"Not Found","statusCode":404}
+Stack: NotFoundException: Cannot GET /uploads/file-1771617716599-890068083.pdf
+    at callback (C:\Users\lucassouza\.gemini\antigravity\playground\fusion-ring\backend\node_modules\@nestjs\core\router\routes-resolver.js:77:19)
+    at C:\Users\lucassouza\.gemini\antigravity\playground\fusion-ring\backend\node_modules\@nestjs\core\router\router-proxy.js:9:23
+    at Layer.handleRequest (C:\Users\lucassouza\.gemini\antigravity\playground\fusion-ring\backend\node_modules\router\lib\layer.js:152:17)
+    at trimPrefix (C:\Users\lucassouza\.gemini\antigravity\playground\fusion-ring\backend\node_modules\router\index.js:342:13)
+    at C:\Users\lucassouza\.gemini\antigravity\playground\fusion-ring\backend\node_modules\router\index.js:297:9
+    at processParams (C:\Users\lucassouza\.gemini\antigravity\playground\fusion-ring\backend\node_modules\router\index.js:582:12)
+    at next (C:\Users\lucassouza\.gemini\antigravity\playground\fusion-ring\backend\node_modules\router\index.js:291:5)
+    at read (C:\Users\lucassouza\.gemini\antigravity\playground\fusion-ring\backend\node_modules\body-parser\lib\read.js:53:5)
+    at urlencodedParser (C:\Users\lucassouza\.gemini\antigravity\playground\fusion-ring\backend\node_modules\body-parser\lib\types\urlencoded.js:57:5)
+    at Layer.handleRequest (C:\Users\lucassouza\.gemini\antigravity\playground\fusion-ring\backend\node_modules\router\lib\layer.js:152:17)
+
+[2026-02-20T20:06:20.031Z] GET /uploads/file-1771617716599-890068083.pdf - Status: 404 - Error: {"message":"Cannot GET /uploads/file-1771617716599-890068083.pdf","error":"Not Found","statusCode":404}
+Stack: NotFoundException: Cannot GET /uploads/file-1771617716599-890068083.pdf
+    at callback (C:\Users\lucassouza\.gemini\antigravity\playground\fusion-ring\backend\node_modules\@nestjs\core\router\routes-resolver.js:77:19)
+    at C:\Users\lucassouza\.gemini\antigravity\playground\fusion-ring\backend\node_modules\@nestjs\core\router\router-proxy.js:9:23
+    at Layer.handleRequest (C:\Users\lucassouza\.gemini\antigravity\playground\fusion-ring\backend\node_modules\router\lib\layer.js:152:17)
+    at trimPrefix (C:\Users\lucassouza\.gemini\antigravity\playground\fusion-ring\backend\node_modules\router\index.js:342:13)
+    at C:\Users\lucassouza\.gemini\antigravity\playground\fusion-ring\backend\node_modules\router\index.js:297:9
+    at processParams (C:\Users\lucassouza\.gemini\antigravity\playground\fusion-ring\backend\node_modules\router\index.js:582:12)
+    at next (C:\Users\lucassouza\.gemini\antigravity\playground\fusion-ring\backend\node_modules\router\index.js:291:5)
+    at read (C:\Users\lucassouza\.gemini\antigravity\playground\fusion-ring\backend\node_modules\body-parser\lib\read.js:53:5)
+    at urlencodedParser (C:\Users\lucassouza\.gemini\antigravity\playground\fusion-ring\backend\node_modules\body-parser\lib\types\urlencoded.js:57:5)
+    at Layer.handleRequest (C:\Users\lucassouza\.gemini\antigravity\playground\fusion-ring\backend\node_modules\router\lib\layer.js:152:17)
+
+[2026-02-20T20:07:28.925Z] GET /uploads/file-1771617716599-890068083.pdf - Status: 404 - Error: {"message":"Cannot GET /uploads/file-1771617716599-890068083.pdf","error":"Not Found","statusCode":404}
+Stack: NotFoundException: Cannot GET /uploads/file-1771617716599-890068083.pdf
+    at callback (C:\Users\lucassouza\.gemini\antigravity\playground\fusion-ring\backend\node_modules\@nestjs\core\router\routes-resolver.js:77:19)
+    at C:\Users\lucassouza\.gemini\antigravity\playground\fusion-ring\backend\node_modules\@nestjs\core\router\router-proxy.js:9:23
+    at Layer.handleRequest (C:\Users\lucassouza\.gemini\antigravity\playground\fusion-ring\backend\node_modules\router\lib\layer.js:152:17)
+    at trimPrefix (C:\Users\lucassouza\.gemini\antigravity\playground\fusion-ring\backend\node_modules\router\index.js:342:13)
+    at C:\Users\lucassouza\.gemini\antigravity\playground\fusion-ring\backend\node_modules\router\index.js:297:9
+    at processParams (C:\Users\lucassouza\.gemini\antigravity\playground\fusion-ring\backend\node_modules\router\index.js:582:12)
+    at next (C:\Users\lucassouza\.gemini\antigravity\playground\fusion-ring\backend\node_modules\router\index.js:291:5)
+    at read (C:\Users\lucassouza\.gemini\antigravity\playground\fusion-ring\backend\node_modules\body-parser\lib\read.js:53:5)
+    at urlencodedParser (C:\Users\lucassouza\.gemini\antigravity\playground\fusion-ring\backend\node_modules\body-parser\lib\types\urlencoded.js:57:5)
+    at Layer.handleRequest (C:\Users\lucassouza\.gemini\antigravity\playground\fusion-ring\backend\node_modules\router\lib\layer.js:152:17)
+

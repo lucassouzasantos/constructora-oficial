@@ -7,7 +7,7 @@ interface Worker {
     id: number;
     name: string;
     role: string;
-    hourlyRate: number;
+    dailyRate: number;
     phone: string;
     active: boolean;
 }
@@ -22,7 +22,7 @@ export default function TeamPage() {
     const [formData, setFormData] = useState({
         name: '',
         role: '',
-        hourlyRate: '',
+        dailyRate: '',
         phone: ''
     });
     const [editingId, setEditingId] = useState<number | null>(null);
@@ -82,14 +82,14 @@ export default function TeamPage() {
         setFormData({
             name: worker.name,
             role: worker.role,
-            hourlyRate: worker.hourlyRate.toString(),
+            dailyRate: worker.dailyRate.toString(),
             phone: worker.phone
         });
         setIsModalOpen(true);
     };
 
     const resetForm = () => {
-        setFormData({ name: '', role: '', hourlyRate: '', phone: '' });
+        setFormData({ name: '', role: '', dailyRate: '', phone: '' });
         setEditingId(null);
     };
 
@@ -133,7 +133,7 @@ export default function TeamPage() {
                             <tr>
                                 <th className="px-6 py-4 font-semibold text-slate-700 text-sm">Colaborador</th>
                                 <th className="px-6 py-4 font-semibold text-slate-700 text-sm">Função</th>
-                                <th className="px-6 py-4 font-semibold text-slate-700 text-sm">Custo/Hora</th>
+                                <th className="px-6 py-4 font-semibold text-slate-700 text-sm">Custo/Dia</th>
                                 <th className="px-6 py-4 font-semibold text-slate-700 text-sm">Contato</th>
                                 <th className="px-6 py-4 font-semibold text-slate-700 text-sm">Status</th>
                                 <th className="px-6 py-4 font-semibold text-slate-700 text-sm text-right">Ações</th>
@@ -154,7 +154,7 @@ export default function TeamPage() {
                                         {worker.role}
                                     </td>
                                     <td className="px-6 py-4 text-sm font-bold text-slate-700">
-                                        {formatCurrency(worker.hourlyRate)}/h
+                                        {formatCurrency(worker.dailyRate)}/dia
                                     </td>
                                     <td className="px-6 py-4 text-sm text-slate-600">
                                         {worker.phone || '-'}
@@ -224,12 +224,11 @@ export default function TeamPage() {
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-sm font-medium text-slate-700 mb-1">Custo Hora (₲)</label>
+                                    <label className="block text-sm font-medium text-slate-700 mb-1">Custo Diário (₲)</label>
                                     <CurrencyInput
-                                        required
                                         className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-all"
-                                        value={formData.hourlyRate}
-                                        onValueChange={val => setFormData({ ...formData, hourlyRate: val })}
+                                        value={formData.dailyRate}
+                                        onValueChange={val => setFormData({ ...formData, dailyRate: val })}
                                         placeholder="0"
                                     />
                                 </div>

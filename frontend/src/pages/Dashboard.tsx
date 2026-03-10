@@ -1,10 +1,11 @@
-import { TrendingUp, Users, Wallet, HardHat } from 'lucide-react';
+import { TrendingUp, Users, Wallet, HardHat, CheckCircle } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { formatCurrency } from '../utils/format';
 
 export default function Dashboard() {
     const [stats, setStats] = useState({
         activeProjects: 0,
+        finishedProjects: 0,
         totalWorkers: 0,
         monthlyRevenue: 0,
         monthlyExpense: 0
@@ -17,7 +18,8 @@ export default function Dashboard() {
                 // 1. Fetch Projects
                 const projectsRes = await fetch('http://localhost:3000/projects');
                 const projects = await projectsRes.json();
-                const activeProjects = Array.isArray(projects) ? projects.length : 0; // Simplified active check
+                const activeProjects = Array.isArray(projects) ? projects.filter((p: any) => p.status !== 'FINISHED').length : 0;
+                const finishedProjects = Array.isArray(projects) ? projects.filter((p: any) => p.status === 'FINISHED').length : 0;
 
                 // 2. Fetch Workers
                 const workersRes = await fetch('http://localhost:3000/workers');
@@ -50,6 +52,7 @@ export default function Dashboard() {
 
                 setStats({
                     activeProjects,
+                    finishedProjects,
                     totalWorkers,
                     monthlyRevenue,
                     monthlyExpense
@@ -65,7 +68,8 @@ export default function Dashboard() {
     }, []);
 
     const cards = [
-        { label: 'Obras Ativas', value: loading ? '...' : stats.activeProjects, icon: HardHat, color: 'bg-orange-500', trend: 'Total Geral' },
+        { label: 'Obras Ativas', value: loading ? '...' : stats.activeProjects, icon: HardHat, color: 'bg-orange-500', trend: 'Em Andamento' },
+        { label: 'Obras Finalizadas', value: loading ? '...' : stats.finishedProjects, icon: CheckCircle, color: 'bg-green-500', trend: 'Concluídas' },
         { label: 'Equipe Total', value: loading ? '...' : stats.totalWorkers, icon: Users, color: 'bg-slate-700', trend: 'Ativos' },
         { label: 'Receita (Mês)', value: loading ? '...' : formatCurrency(stats.monthlyRevenue), icon: TrendingUp, color: 'bg-emerald-500', trend: 'Recebido' },
         { label: 'Despesa (Mês)', value: loading ? '...' : formatCurrency(stats.monthlyExpense), icon: Wallet, color: 'bg-red-500', trend: 'Pago' },
@@ -74,7 +78,7 @@ export default function Dashboard() {
     return (
         <div className="space-y-8">
             {/* Stats Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
                 {cards.map((stat, index) => (
                     <div key={index} className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow">
                         <div className="flex items-start justify-between mb-4">

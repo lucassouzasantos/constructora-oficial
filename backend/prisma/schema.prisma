@@ -20,73 +20,76 @@ model FinancialTransaction {
   id          Int      @id @default(autoincrement())
   description String
   amount      Decimal  @db.Decimal(10, 2)
-  type        String   // INCOME, EXPENSE
-  status      String   // PENDING, PAID
+  type        String // INCOME, EXPENSE
+  status      String // PENDING, PAID
   dueDate     DateTime
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  
-  supplierId  Int?
-  supplier    Supplier? @relation(fields: [supplierId], references: [id])
-  customerId  Int?
-  customer    Customer? @relation(fields: [customerId], references: [id])
-  projectId   Int?
-  project     Project? @relation(fields: [projectId], references: [id])
-  category    String?  // 'MÃO_DE_OBRA', 'MATERIAIS', 'SERVIÇOS', 'OUTROS'
-  quantity    Decimal? @db.Decimal(10, 2)
-  unit        String?
+
+  supplierId   Int?
+  supplier     Supplier?   @relation(fields: [supplierId], references: [id])
+  customerId   Int?
+  customer     Customer?   @relation(fields: [customerId], references: [id])
+  projectId    Int?
+  project      Project?    @relation(fields: [projectId], references: [id])
+  category     String? // 'MÃO_DE_OBRA', 'MATERIAIS', 'SERVIÇOS', 'OUTROS'
+  quantity     Decimal?    @db.Decimal(10, 2)
+  unit         String?
   costCenterId Int?
   costCenter   CostCenter? @relation(fields: [costCenterId], references: [id])
 }
 
 model Supplier {
-  id          Int      @id @default(autoincrement())
-  name        String
-  ruc         String?
-  phone       String?
-  email       String?
-  category    String?
+  id           Int                    @id @default(autoincrement())
+  name         String
+  ruc          String?
+  phone        String?
+  email        String?
+  category     String?
   transactions FinancialTransaction[]
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt    DateTime               @default(now())
+  updatedAt    DateTime               @updatedAt
 }
 
 model Project {
-  id          Int      @id @default(autoincrement())
-  name        String
-  city        String?
-  location    String?
-  totalArea   Decimal? @db.Decimal(10, 2) // m2
-  salesValue  Decimal? @db.Decimal(15, 2) // Contract/Sale value
-  startDate   DateTime?
-  endDate     DateTime?
-  customerId  Int?
-  customer    Customer? @relation(fields: [customerId], references: [id])
-  budgets     ProjectBudget[]
-  transactions FinancialTransaction[]
-  stages      ProjectStage[]
-  workLogs    WorkLog[]
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id            Int                    @id @default(autoincrement())
+  name          String
+  status        String                 @default("ACTIVE") // ACTIVE, FINISHED
+  city          String?
+  location      String?
+  totalArea     Decimal?               @db.Decimal(10, 2) // m2
+  salesValue    Decimal?               @db.Decimal(15, 2) // Contract/Sale value
+  startDate     DateTime?
+  endDate       DateTime?
+  customerId    Int?
+  customer      Customer?              @relation(fields: [customerId], references: [id])
+  budgets       ProjectBudget[]
+  transactions  FinancialTransaction[]
+  stages        ProjectStage[]
+  workLogs      WorkLog[]
+  createdAt     DateTime               @default(now())
+  updatedAt     DateTime               @updatedAt
+  InventoryItem InventoryItem[]
+  contracts     Contract[]
 }
 
 model ProjectStage {
-  id               Int      @id @default(autoincrement())
+  id               Int       @id @default(autoincrement())
   name             String
   startDatePlanned DateTime?
   endDatePlanned   DateTime?
   startDateReal    DateTime?
   endDateReal      DateTime?
-  status           String   @default("PENDING") // PENDING, IN_PROGRESS, COMPLETED
+  status           String    @default("PENDING") // PENDING, IN_PROGRESS, COMPLETED
   projectId        Int
-  project          Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+  project          Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
 }
 
 model ProjectBudget {
   id          Int      @id @default(autoincrement())
-  category    String   // 'MÃO_DE_OBRA', 'MATERIAIS', 'SERVIÇOS', 'OUTROS'
+  category    String // 'MÃO_DE_OBRA', 'MATERIAIS', 'SERVIÇOS', 'OUTROS'
   amount      Decimal  @db.Decimal(10, 2)
   description String?
   projectId   Int
@@ -96,52 +99,85 @@ model ProjectBudget {
 }
 
 model Customer {
-  id          Int      @id @default(autoincrement())
-  name        String
-  ci          String?
-  phone       String?
-  email       String?
+  id           Int                    @id @default(autoincrement())
+  name         String
+  ci           String?
+  phone        String?
+  email        String?
+  city         String?
   transactions FinancialTransaction[]
-  projects    Project[]
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  projects     Project[]
+  contracts    Contract[]
+  createdAt    DateTime               @default(now())
+  updatedAt    DateTime               @updatedAt
 }
 
-
 model Worker {
-  id          Int      @id @default(autoincrement())
-  name        String
-  role        String?
-  hourlyRate  Decimal  @db.Decimal(10, 2)
-  phone       String?
-  active      Boolean  @default(true)
-  workLogs    WorkLog[]
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id         Int       @id @default(autoincrement())
+  name       String
+  role       String?
+  dailyRate  Decimal   @db.Decimal(10, 2)
+  phone      String?
+  active     Boolean   @default(true)
+  workLogs   WorkLog[]
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
 }
 
 model WorkLog {
   id          Int      @id @default(autoincrement())
   date        DateTime
-  hours       Decimal  @db.Decimal(10, 2)
+  days        Decimal  @db.Decimal(10, 2)
   description String?
-  
-  workerId    Int
-  worker      Worker   @relation(fields: [workerId], references: [id])
-  
-  projectId   Int
-  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+
+  workerId Int
+  worker   Worker @relation(fields: [workerId], references: [id])
+
+  projectId Int
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model CostCenter {
+  id           Int                    @id @default(autoincrement())
+  name         String
+  code         String?
+  active       Boolean                @default(true)
+  transactions FinancialTransaction[]
+  createdAt    DateTime               @default(now())
+  updatedAt    DateTime               @updatedAt
+}
+
+model InventoryItem {
   id          Int      @id @default(autoincrement())
   name        String
-  code        String?
-  active      Boolean  @default(true)
-  transactions FinancialTransaction[]
+  description String?
+  quantity    Decimal  @db.Decimal(10, 2)
+  unit        String // 'Un', 'Kg', 'L', 'Cx', 'M'
+  minQuantity Decimal? @db.Decimal(10, 2)
+  unitValue   Decimal? @db.Decimal(10, 2) // Valor Monetário (Price)
+
+  projectId Int?
+  project   Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Contract {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String?
+  fileUrl     String   // Caminho do arquivo salvo
+  fileType    String?  // Ex: application/pdf, image/jpeg
   createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+
+  // Relações
+  projectId   Int?
+  project     Project?  @relation(fields: [projectId], references: [id], onDelete: SetNull)
+
+  customerId  Int?
+  customer    Customer? @relation(fields: [customerId], references: [id], onDelete: SetNull)
 }
