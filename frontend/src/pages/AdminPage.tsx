@@ -87,11 +87,17 @@ export default function AdminPage() {
                 setIsModalOpen(false);
                 fetchUsers();
             } else {
-                const err = await res.json();
-                alert(err.message || 'Erro ao salvar usuário');
+                const err = await res.json().catch(() => ({}));
+                let errorMessage = 'Falha ao salvar usuário.';
+                if (err.message) {
+                    // Nest validation errors come as array of strings
+                    errorMessage = Array.isArray(err.message) ? err.message.join('\n') : err.message;
+                }
+                alert(`Erro ao salvar usuário:\n${errorMessage}`);
             }
         } catch (error) {
             console.error('Error saving user:', error);
+            alert('Erro de rede ao salvar usuário. Verifique a conexão.');
         }
     };
 
