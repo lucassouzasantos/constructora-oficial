@@ -147,6 +147,7 @@ model CostCenter {
   name         String
   code         String?
   active       Boolean                @default(true)
+  budget       Decimal?               @db.Decimal(15, 2)
   transactions FinancialTransaction[]
   createdAt    DateTime               @default(now())
   updatedAt    DateTime               @updatedAt

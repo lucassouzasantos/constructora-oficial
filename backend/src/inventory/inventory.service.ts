@@ -19,7 +19,7 @@ export class InventoryService {
         : Number(createInventoryDto.minQuantity);
     }
 
-    let unitValue: number | undefined = undefined;
+    let unitValue: number = 0;
     if (createInventoryDto.unitValue !== undefined) {
       unitValue = typeof createInventoryDto.unitValue === 'string'
         ? Number(createInventoryDto.unitValue.replace(/\./g, '').replace(/,/g, '.'))

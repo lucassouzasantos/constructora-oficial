@@ -343,8 +343,8 @@ export default function ProjectDetailsPage() {
             setEditingStage(stage);
             setFormData({
                 name: stage.name,
-                startDatePlanned: stage.startDatePlanned ? new Date(stage.startDatePlanned).toISOString().split('T')[0] : '',
-                endDatePlanned: stage.endDatePlanned ? new Date(stage.endDatePlanned).toISOString().split('T')[0] : '',
+                startDatePlanned: stage.startDatePlanned ? stage.startDatePlanned.split('T')[0] : '',
+                endDatePlanned: stage.endDatePlanned ? stage.endDatePlanned.split('T')[0] : '',
                 status: stage.status
             });
         } else {
@@ -612,7 +612,7 @@ export default function ProjectDetailsPage() {
                                                     <div className="flex items-center gap-2 text-xs text-slate-500">
                                                         <Calendar className="w-3 h-3" />
                                                         <span>
-                                                            {new Date(stage.startDatePlanned).toLocaleDateString()} - {new Date(stage.endDatePlanned).toLocaleDateString()}
+                                                            {stage.startDatePlanned ? stage.startDatePlanned.split('T')[0].split('-').reverse().join('/') : 'A definir'} - {stage.endDatePlanned ? stage.endDatePlanned.split('T')[0].split('-').reverse().join('/') : 'A definir'}
                                                         </span>
                                                     </div>
                                                 </div>
@@ -702,7 +702,7 @@ export default function ProjectDetailsPage() {
                                 <tbody className="divide-y divide-slate-100">
                                     {expenses.filter(e => e.category === 'MATERIAIS').map(item => (
                                         <tr key={item.id} className="hover:bg-slate-50 transition-colors">
-                                            <td className="px-6 py-4 text-sm text-slate-600">{new Date(item.dueDate).toLocaleDateString()}</td>
+                                            <td className="px-6 py-4 text-sm text-slate-600">{item.dueDate ? item.dueDate.split('T')[0].split('-').reverse().join('/') : '-'}</td>
                                             <td className="px-6 py-4 text-sm font-medium text-slate-800">{item.description}</td>
                                             <td className="px-6 py-4 text-sm text-slate-600">{item.quantity || '-'}</td>
                                             <td className="px-6 py-4 text-sm text-slate-600">{item.unit || '-'}</td>
@@ -761,7 +761,7 @@ export default function ProjectDetailsPage() {
                                 <tbody className="divide-y divide-slate-100">
                                     {expenses.filter(e => e.category === 'SERVIÇOS' || e.category === 'MÃO_DE_OBRA').map(item => (
                                         <tr key={item.id} className="hover:bg-slate-50 transition-colors">
-                                            <td className="px-6 py-4 text-sm text-slate-600">{new Date(item.dueDate).toLocaleDateString()}</td>
+                                            <td className="px-6 py-4 text-sm text-slate-600">{item.dueDate ? item.dueDate.split('T')[0].split('-').reverse().join('/') : '-'}</td>
                                             <td className="px-6 py-4 text-sm font-medium text-slate-800">{item.description}</td>
                                             <td className="px-6 py-4 text-sm text-slate-600">{item.supplier?.name || '-'}</td>
                                             <td className="px-6 py-4 text-sm">
@@ -839,7 +839,7 @@ export default function ProjectDetailsPage() {
                                     {workLogs.map(log => (
                                         <tr key={log.id} className="hover:bg-slate-50 transition-colors">
                                             <td className="px-6 py-4 text-sm text-slate-600">
-                                                {new Date(log.date).toLocaleDateString()}
+                                                {log.date ? log.date.split('T')[0].split('-').reverse().join('/') : '-'}
                                             </td>
                                             <td className="px-6 py-4 text-sm font-medium text-slate-800">
                                                 {log.worker.name}

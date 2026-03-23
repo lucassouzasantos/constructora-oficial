@@ -22,6 +22,7 @@ interface Transaction {
     supplierId?: number;
     customerId?: number;
     projectId?: number;
+    project?: { id: number; name: string };
     category?: string;
 }
 
@@ -369,6 +370,7 @@ export default function FinancePage() {
                                 <tr>
                                     <th className="px-6 py-3 font-medium">Descrição</th>
                                     <th className="px-6 py-3 font-medium">{activeTab === 'EXPENSE' ? 'Fornecedor' : 'Cliente'}</th>
+                                    <th className="px-6 py-3 font-medium">Obra</th>
                                     <th className="px-6 py-3 font-medium">Vencimento</th>
                                     <th className="px-6 py-3 font-medium">Status</th>
                                     <th className="px-6 py-3 font-medium text-right">Valor</th>
@@ -377,7 +379,7 @@ export default function FinancePage() {
                             </thead>
                             <tbody>
                                 {loading ? (
-                                    Array.from({ length: 5 }).map((_, i) => <TableRowSkeleton key={i} columns={6} />)
+                                    Array.from({ length: 5 }).map((_, i) => <TableRowSkeleton key={i} columns={7} />)
                                 ) : (
                                     filteredTransactions.map((transaction) => (
                                         <tr key={transaction.id} className="border-b border-slate-50 hover:bg-slate-50/50 transition-colors">
@@ -386,7 +388,10 @@ export default function FinancePage() {
                                                 {transaction.supplier?.name || transaction.customer?.name || '-'}
                                             </td>
                                             <td className="px-6 py-4 text-slate-500">
-                                                {new Date(transaction.dueDate).toLocaleDateString()}
+                                                {transaction.project?.name || '-'}
+                                            </td>
+                                            <td className="px-6 py-4 text-slate-500">
+                                                {transaction.dueDate ? transaction.dueDate.split('T')[0].split('-').reverse().join('/') : '-'}
                                             </td>
                                             <td className="px-6 py-4">
                                                 <Badge variant={transaction.status === 'PAID' ? 'success' : 'warning'}>
@@ -428,7 +433,7 @@ export default function FinancePage() {
                                     )))}
                                 {filteredTransactions.length === 0 && !loading && (
                                     <tr>
-                                        <td colSpan={6} className="px-6 py-12 text-center text-slate-400">
+                                        <td colSpan={7} className="px-6 py-12 text-center text-slate-400">
                                             {loading ? 'Carregando...' : 'Nenhuma transação encontrada.'}
                                         </td>
                                     </tr>

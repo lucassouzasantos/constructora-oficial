@@ -179,7 +179,9 @@ export class QuotesService {
         stages: {
           create: quote.stages.map(s => ({
             name: s.name,
-            status: 'PENDING'
+            status: 'PENDING',
+            startDatePlanned: new Date(),
+            endDatePlanned: new Date()
           }))
         },
         budgets: {

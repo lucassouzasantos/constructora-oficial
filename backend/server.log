@@ -76,3 +76,120 @@ Stack: NotFoundException: Cannot GET /uploads/file-1771617716599-890068083.pdf
     at urlencodedParser (C:\Users\lucassouza\.gemini\antigravity\playground\fusion-ring\backend\node_modules\body-parser\lib\types\urlencoded.js:57:5)
     at Layer.handleRequest (C:\Users\lucassouza\.gemini\antigravity\playground\fusion-ring\backend\node_modules\router\lib\layer.js:152:17)
 
+[2026-03-19T11:22:19.774Z] GET /quotes - Status: 401 - Error: {"message":"Unauthorized","statusCode":401}
+Stack: UnauthorizedException: Unauthorized
+    at MixinAuthGuard.handleRequest (C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\@nestjs\passport\dist\auth.guard.js:60:30)
+    at C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\@nestjs\passport\dist\auth.guard.js:44:124
+    at C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\@nestjs\passport\dist\auth.guard.js:83:24
+    at allFailed (C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\passport\lib\middleware\authenticate.js:110:18)
+    at attempt (C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\passport\lib\middleware\authenticate.js:183:28)
+    at strategy.fail (C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\passport\lib\middleware\authenticate.js:314:9)
+    at C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\passport-jwt\lib\strategy.js:106:33
+    at C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\jsonwebtoken\verify.js:190:16
+    at getSecret (C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\jsonwebtoken\verify.js:97:14)
+    at module.exports [as verify] (C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\jsonwebtoken\verify.js:101:10)
+
+[2026-03-19T11:22:19.800Z] GET /quotes - Status: 401 - Error: {"message":"Unauthorized","statusCode":401}
+Stack: UnauthorizedException: Unauthorized
+    at MixinAuthGuard.handleRequest (C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\@nestjs\passport\dist\auth.guard.js:60:30)
+    at C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\@nestjs\passport\dist\auth.guard.js:44:124
+    at C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\@nestjs\passport\dist\auth.guard.js:83:24
+    at allFailed (C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\passport\lib\middleware\authenticate.js:110:18)
+    at attempt (C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\passport\lib\middleware\authenticate.js:183:28)
+    at strategy.fail (C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\passport\lib\middleware\authenticate.js:314:9)
+    at C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\passport-jwt\lib\strategy.js:106:33
+    at C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\jsonwebtoken\verify.js:190:16
+    at getSecret (C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\jsonwebtoken\verify.js:97:14)
+    at module.exports [as verify] (C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\jsonwebtoken\verify.js:101:10)
+
+[2026-03-19T17:07:55.515Z] GET /quotes - Status: 401 - Error: {"message":"Unauthorized","statusCode":401}
+Stack: UnauthorizedException: Unauthorized
+    at MixinAuthGuard.handleRequest (C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\@nestjs\passport\dist\auth.guard.js:60:30)
+    at C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\@nestjs\passport\dist\auth.guard.js:44:124
+    at C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\@nestjs\passport\dist\auth.guard.js:83:24
+    at allFailed (C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\passport\lib\middleware\authenticate.js:110:18)
+    at attempt (C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\passport\lib\middleware\authenticate.js:183:28)
+    at strategy.fail (C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\passport\lib\middleware\authenticate.js:314:9)
+    at C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\passport-jwt\lib\strategy.js:106:33
+    at C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\jsonwebtoken\verify.js:190:16
+    at getSecret (C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\jsonwebtoken\verify.js:97:14)
+    at module.exports [as verify] (C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\jsonwebtoken\verify.js:101:10)
+
+[2026-03-19T17:07:55.531Z] GET /quotes - Status: 401 - Error: {"message":"Unauthorized","statusCode":401}
+Stack: UnauthorizedException: Unauthorized
+    at MixinAuthGuard.handleRequest (C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\@nestjs\passport\dist\auth.guard.js:60:30)
+    at C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\@nestjs\passport\dist\auth.guard.js:44:124
+    at C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\@nestjs\passport\dist\auth.guard.js:83:24
+    at allFailed (C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\passport\lib\middleware\authenticate.js:110:18)
+    at attempt (C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\passport\lib\middleware\authenticate.js:183:28)
+    at strategy.fail (C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\passport\lib\middleware\authenticate.js:314:9)
+    at C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\passport-jwt\lib\strategy.js:106:33
+    at C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\jsonwebtoken\verify.js:190:16
+    at getSecret (C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\jsonwebtoken\verify.js:97:14)
+    at module.exports [as verify] (C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\jsonwebtoken\verify.js:101:10)
+
+[2026-03-19T19:50:47.656Z] PATCH /quotes/1 - Status: 401 - Error: {"message":"Unauthorized","statusCode":401}
+Stack: UnauthorizedException: Unauthorized
+    at MixinAuthGuard.handleRequest (C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\@nestjs\passport\dist\auth.guard.js:60:30)
+    at C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\@nestjs\passport\dist\auth.guard.js:44:124
+    at C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\@nestjs\passport\dist\auth.guard.js:83:24
+    at allFailed (C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\passport\lib\middleware\authenticate.js:110:18)
+    at attempt (C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\passport\lib\middleware\authenticate.js:183:28)
+    at strategy.fail (C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\passport\lib\middleware\authenticate.js:314:9)
+    at C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\passport-jwt\lib\strategy.js:106:33
+    at C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\jsonwebtoken\verify.js:190:16
+    at getSecret (C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\jsonwebtoken\verify.js:97:14)
+    at module.exports [as verify] (C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\jsonwebtoken\verify.js:101:10)
+
+[2026-03-20T12:05:00.756Z] GET /quotes - Status: 401 - Error: {"message":"Unauthorized","statusCode":401}
+Stack: UnauthorizedException: Unauthorized
+    at MixinAuthGuard.handleRequest (C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\@nestjs\passport\dist\auth.guard.js:60:30)
+    at C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\@nestjs\passport\dist\auth.guard.js:44:124
+    at C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\@nestjs\passport\dist\auth.guard.js:83:24
+    at allFailed (C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\passport\lib\middleware\authenticate.js:110:18)
+    at attempt (C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\passport\lib\middleware\authenticate.js:183:28)
+    at strategy.fail (C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\passport\lib\middleware\authenticate.js:314:9)
+    at C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\passport-jwt\lib\strategy.js:106:33
+    at C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\jsonwebtoken\verify.js:190:16
+    at getSecret (C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\jsonwebtoken\verify.js:97:14)
+    at module.exports [as verify] (C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\jsonwebtoken\verify.js:101:10)
+
+[2026-03-20T12:05:00.783Z] GET /quotes - Status: 401 - Error: {"message":"Unauthorized","statusCode":401}
+Stack: UnauthorizedException: Unauthorized
+    at MixinAuthGuard.handleRequest (C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\@nestjs\passport\dist\auth.guard.js:60:30)
+    at C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\@nestjs\passport\dist\auth.guard.js:44:124
+    at C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\@nestjs\passport\dist\auth.guard.js:83:24
+    at allFailed (C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\passport\lib\middleware\authenticate.js:110:18)
+    at attempt (C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\passport\lib\middleware\authenticate.js:183:28)
+    at strategy.fail (C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\passport\lib\middleware\authenticate.js:314:9)
+    at C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\passport-jwt\lib\strategy.js:106:33
+    at C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\jsonwebtoken\verify.js:190:16
+    at getSecret (C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\jsonwebtoken\verify.js:97:14)
+    at module.exports [as verify] (C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\jsonwebtoken\verify.js:101:10)
+
+[2026-03-20T19:16:05.129Z] GET /quotes - Status: 401 - Error: {"message":"Unauthorized","statusCode":401}
+Stack: UnauthorizedException: Unauthorized
+    at MixinAuthGuard.handleRequest (C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\@nestjs\passport\dist\auth.guard.js:60:30)
+    at C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\@nestjs\passport\dist\auth.guard.js:44:124
+    at C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\@nestjs\passport\dist\auth.guard.js:83:24
+    at allFailed (C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\passport\lib\middleware\authenticate.js:110:18)
+    at attempt (C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\passport\lib\middleware\authenticate.js:183:28)
+    at strategy.fail (C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\passport\lib\middleware\authenticate.js:314:9)
+    at C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\passport-jwt\lib\strategy.js:106:33
+    at C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\jsonwebtoken\verify.js:190:16
+    at getSecret (C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\jsonwebtoken\verify.js:97:14)
+    at module.exports [as verify] (C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\jsonwebtoken\verify.js:101:10)
+
+[2026-03-20T19:16:05.162Z] GET /quotes - Status: 401 - Error: {"message":"Unauthorized","statusCode":401}
+Stack: UnauthorizedException: Unauthorized
+    at MixinAuthGuard.handleRequest (C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\@nestjs\passport\dist\auth.guard.js:60:30)
+    at C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\@nestjs\passport\dist\auth.guard.js:44:124
+    at C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\@nestjs\passport\dist\auth.guard.js:83:24
+    at allFailed (C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\passport\lib\middleware\authenticate.js:110:18)
+    at attempt (C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\passport\lib\middleware\authenticate.js:183:28)
+    at strategy.fail (C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\passport\lib\middleware\authenticate.js:314:9)
+    at C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\passport-jwt\lib\strategy.js:106:33
+    at C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\jsonwebtoken\verify.js:190:16
+    at getSecret (C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\jsonwebtoken\verify.js:97:14)
+    at module.exports [as verify] (C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\jsonwebtoken\verify.js:101:10)
+
