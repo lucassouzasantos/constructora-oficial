@@ -120,7 +120,7 @@ export default function ProjectDetailsPage() {
     const handleFinanceSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            await fetch('http://localhost:3000/finance', {
+            await fetch(`${import.meta.env.VITE_API_URL}/finance`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -171,7 +171,7 @@ export default function ProjectDetailsPage() {
 
     const fetchWorkers = async () => {
         try {
-            const response = await fetch('http://localhost:3000/workers');
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/workers`);
             const data = await response.json();
             if (Array.isArray(data)) {
                 setWorkers(data.filter((w: any) => w.active));
@@ -186,7 +186,7 @@ export default function ProjectDetailsPage() {
 
     const fetchWorkLogs = async () => {
         try {
-            const response = await fetch(`http://localhost:3000/work-logs?projectId=${id}&t=${new Date().getTime()}`);
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/work-logs?projectId=${id}&t=${new Date().getTime()}`);
             const data = await response.json();
             if (Array.isArray(data)) {
                 setWorkLogs(data);
@@ -202,7 +202,7 @@ export default function ProjectDetailsPage() {
     const handleWorkLogSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            await fetch('http://localhost:3000/work-logs', {
+            await fetch(`${import.meta.env.VITE_API_URL}/work-logs`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -229,7 +229,7 @@ export default function ProjectDetailsPage() {
     const handleDeleteWorkLog = async (logId: number) => {
         if (!confirm('Excluir lançamento?')) return;
         try {
-            await fetch(`http://localhost:3000/work-logs/${logId}`, { method: 'DELETE' });
+            await fetch(`${import.meta.env.VITE_API_URL}/work-logs/${logId}`, { method: 'DELETE' });
             fetchWorkLogs();
         } catch (error) {
             console.error('Error deleting work log:', error);
@@ -238,7 +238,7 @@ export default function ProjectDetailsPage() {
 
     const fetchBudgets = async () => {
         try {
-            const response = await fetch(`http://localhost:3000/project-budgets?projectId=${id}&t=${new Date().getTime()}`);
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/project-budgets?projectId=${id}&t=${new Date().getTime()}`);
             const data = await response.json();
             if (Array.isArray(data)) {
                 setBudgets(data);
@@ -252,7 +252,7 @@ export default function ProjectDetailsPage() {
 
     const fetchExpenses = async () => {
         try {
-            const response = await fetch(`http://localhost:3000/finance?projectId=${id}&t=${new Date().getTime()}`);
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/finance?projectId=${id}&t=${new Date().getTime()}`);
             const data = await response.json();
             if (Array.isArray(data)) {
                 setExpenses(data);
@@ -283,8 +283,8 @@ export default function ProjectDetailsPage() {
         e.preventDefault();
         try {
             const url = editingBudget
-                ? `http://localhost:3000/project-budgets/${editingBudget.id}`
-                : 'http://localhost:3000/project-budgets';
+                ? `${import.meta.env.VITE_API_URL}/project-budgets/${editingBudget.id}`
+                : `${import.meta.env.VITE_API_URL}/project-budgets`;
 
             const method = editingBudget ? 'PATCH' : 'POST';
 
@@ -307,7 +307,7 @@ export default function ProjectDetailsPage() {
     const handleDeleteBudget = async (budgetId: number) => {
         if (!confirm('Excluir este orçamento previsto?')) return;
         try {
-            await fetch(`http://localhost:3000/project-budgets/${budgetId}`, { method: 'DELETE' });
+            await fetch(`${import.meta.env.VITE_API_URL}/project-budgets/${budgetId}`, { method: 'DELETE' });
             fetchBudgets();
         } catch (error) {
             console.error('Error deleting budget:', error);
@@ -316,7 +316,7 @@ export default function ProjectDetailsPage() {
 
     const fetchProject = async () => {
         try {
-            const response = await fetch(`http://localhost:3000/projects/${id}`);
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/projects/${id}`);
             const data = await response.json();
             setProject(data);
         } catch (error) {
@@ -326,7 +326,7 @@ export default function ProjectDetailsPage() {
 
     const fetchStages = async () => {
         try {
-            const response = await fetch(`http://localhost:3000/project-stages?projectId=${id}`);
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/project-stages?projectId=${id}`);
             const data = await response.json();
             if (Array.isArray(data)) {
                 setStages(data);
@@ -358,8 +358,8 @@ export default function ProjectDetailsPage() {
         e.preventDefault();
         try {
             const url = editingStage
-                ? `http://localhost:3000/project-stages/${editingStage.id}`
-                : 'http://localhost:3000/project-stages';
+                ? `${import.meta.env.VITE_API_URL}/project-stages/${editingStage.id}`
+                : `${import.meta.env.VITE_API_URL}/project-stages`;
 
             const method = editingStage ? 'PATCH' : 'POST';
 
@@ -382,7 +382,7 @@ export default function ProjectDetailsPage() {
     const handleDeleteStage = async (stageId: number) => {
         if (!confirm('Excluir etapa?')) return;
         try {
-            await fetch(`http://localhost:3000/project-stages/${stageId}`, { method: 'DELETE' });
+            await fetch(`${import.meta.env.VITE_API_URL}/project-stages/${stageId}`, { method: 'DELETE' });
             fetchStages();
         } catch (error) {
             console.error('Error deleting stage:', error);
@@ -392,7 +392,7 @@ export default function ProjectDetailsPage() {
     const handleDeleteExpense = async (expenseId: number) => {
         if (!confirm('Excluir lançamento financeiro?')) return;
         try {
-            await fetch(`http://localhost:3000/finance/${expenseId}`, { method: 'DELETE' });
+            await fetch(`${import.meta.env.VITE_API_URL}/finance/${expenseId}`, { method: 'DELETE' });
             fetchExpenses();
         } catch (error) {
             console.error('Error deleting expense:', error);
@@ -412,7 +412,7 @@ export default function ProjectDetailsPage() {
     };
 
     const calculateFinancials = () => {
-        const totalExpenses = expenses.reduce((acc, curr) => acc + Number(curr.amount), 0);
+        const totalExpenses = expenses.filter(e => e.type === 'EXPENSE').reduce((acc, curr) => acc + Number(curr.amount), 0);
         const totalLabor = workLogs.reduce((acc, curr) => acc + (Number(curr.days) * Number(curr.worker.dailyRate)), 0);
         const totalCost = totalExpenses + totalLabor;
 
@@ -436,7 +436,7 @@ export default function ProjectDetailsPage() {
     const handleFinishProject = async () => {
         if (!confirm('Tem certeza que deseja finalizar esta obra? Não será possível reverter essa ação.')) return;
         try {
-            const response = await fetch(`http://localhost:3000/projects/${id}`, {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/projects/${id}`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ status: 'FINISHED' })

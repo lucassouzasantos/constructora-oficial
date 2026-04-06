@@ -16,18 +16,18 @@ export default function Dashboard() {
         const fetchData = async () => {
             try {
                 // 1. Fetch Projects
-                const projectsRes = await fetch('http://localhost:3000/projects');
+                const projectsRes = await fetch(`${import.meta.env.VITE_API_URL}/projects`);
                 const projects = await projectsRes.json();
                 const activeProjects = Array.isArray(projects) ? projects.filter((p: any) => p.status !== 'FINISHED').length : 0;
                 const finishedProjects = Array.isArray(projects) ? projects.filter((p: any) => p.status === 'FINISHED').length : 0;
 
                 // 2. Fetch Workers
-                const workersRes = await fetch('http://localhost:3000/workers');
+                const workersRes = await fetch(`${import.meta.env.VITE_API_URL}/workers`);
                 const workers = await workersRes.json();
                 const totalWorkers = Array.isArray(workers) ? workers.length : 0;
 
                 // 3. Fetch Finance for current month
-                const financeRes = await fetch(`http://localhost:3000/finance?t=${new Date().getTime()}`);
+                const financeRes = await fetch(`${import.meta.env.VITE_API_URL}/finance?t=${new Date().getTime()}`);
                 const transactions = await financeRes.json();
 
                 let monthlyRevenue = 0;
@@ -38,7 +38,12 @@ export default function Dashboard() {
 
                 if (Array.isArray(transactions)) {
                     transactions.forEach((t: any) => {
-                        const tDate = new Date(t.dueDate);
+                        const dateStr = t.dueDate ? t.dueDate.split('T')[0] : '';
+                        if (!dateStr) return;
+                        
+                        const [year, month, day] = dateStr.split('-');
+                        const tDate = new Date(Number(year), Number(month) - 1, Number(day));
+                        
                         // Filter by Month & Year AND Status PAID
                         if (tDate.getMonth() === currentMonth &&
                             tDate.getFullYear() === currentYear &&

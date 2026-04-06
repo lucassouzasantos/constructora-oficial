@@ -32,7 +32,7 @@ export default function AdminPage() {
     const fetchUsers = async () => {
         try {
             const token = localStorage.getItem('token');
-            const res = await fetch('http://localhost:3000/users', {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/users`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             if (res.ok) {
@@ -67,8 +67,8 @@ export default function AdminPage() {
         try {
             const token = localStorage.getItem('token');
             const url = editingUserId
-                ? `http://localhost:3000/users/${editingUserId}`
-                : 'http://localhost:3000/users';
+                ? `${import.meta.env.VITE_API_URL}/users/${editingUserId}`
+                : `${import.meta.env.VITE_API_URL}/users`;
             const method = editingUserId ? 'PATCH' : 'POST';
 
             const payload: any = { ...formData };
@@ -105,7 +105,7 @@ export default function AdminPage() {
         if (!confirm('Tem certeza que deseja excluir o usuário?')) return;
         try {
             const token = localStorage.getItem('token');
-            await fetch(`http://localhost:3000/users/${id}`, {
+            await fetch(`${import.meta.env.VITE_API_URL}/users/${id}`, {
                 method: 'DELETE',
                 headers: { 'Authorization': `Bearer ${token}` }
             });

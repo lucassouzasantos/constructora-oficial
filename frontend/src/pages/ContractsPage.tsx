@@ -48,7 +48,7 @@ export default function ContractsPage() {
 
     const fetchContracts = async () => {
         try {
-            const response = await fetch('http://localhost:3000/contracts');
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/contracts`);
             const data = await response.json();
             setContracts(data);
         } catch (error) {
@@ -60,7 +60,7 @@ export default function ContractsPage() {
 
     const fetchProjects = async () => {
         try {
-            const response = await fetch('http://localhost:3000/projects');
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/projects`);
             const data = await response.json();
             setProjects(data);
         } catch (error) {
@@ -70,7 +70,7 @@ export default function ContractsPage() {
 
     const fetchCustomers = async () => {
         try {
-            const response = await fetch('http://localhost:3000/customers');
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/customers`);
             const data = await response.json();
             setCustomers(data);
         } catch (error) {
@@ -105,7 +105,7 @@ export default function ContractsPage() {
         payload.append('file', selectedFile);
 
         try {
-            const response = await fetch('http://localhost:3000/contracts', {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/contracts`, {
                 method: 'POST',
                 body: payload,
             });
@@ -128,7 +128,7 @@ export default function ContractsPage() {
     const handleDelete = async (id: number) => {
         if (!confirm('Tem certeza que deseja excluir este contrato?')) return;
         try {
-            await fetch(`http://localhost:3000/contracts/${id}`, { method: 'DELETE' });
+            await fetch(`${import.meta.env.VITE_API_URL}/contracts/${id}`, { method: 'DELETE' });
             fetchContracts();
         } catch (error) {
             console.error('Error deleting contract:', error);
@@ -221,7 +221,7 @@ export default function ContractsPage() {
                                     Ver Prévia
                                 </button>
                                 <a
-                                    href={`http://localhost:3000${contract.fileUrl}`}
+                                    href={`${import.meta.env.VITE_API_URL}${contract.fileUrl}`}
                                     target="_blank"
                                     rel="noreferrer"
                                     download
@@ -350,7 +350,7 @@ export default function ContractsPage() {
                             </h3>
                             <div className="flex items-center gap-3">
                                 <a
-                                    href={`http://localhost:3000${previewFile.url}`}
+                                    href={`${import.meta.env.VITE_API_URL}${previewFile.url}`}
                                     download
                                     target="_blank"
                                     rel="noreferrer"
@@ -370,13 +370,13 @@ export default function ContractsPage() {
                         <div className="flex-1 overflow-auto bg-slate-100/50 p-6 flex justify-center items-center">
                             {previewFile.type.includes('image') ? (
                                 <img
-                                    src={`http://localhost:3000${previewFile.url}`}
+                                    src={`${import.meta.env.VITE_API_URL}${previewFile.url}`}
                                     alt={previewFile.title}
                                     className="max-w-full max-h-full object-contain rounded-lg shadow-sm"
                                 />
                             ) : previewFile.type.includes('pdf') || previewFile.url.endsWith('.pdf') ? (
                                 <iframe
-                                    src={`http://localhost:3000${previewFile.url}`}
+                                    src={`${import.meta.env.VITE_API_URL}${previewFile.url}`}
                                     className="w-full h-full rounded-lg shadow-sm border border-slate-200 bg-white"
                                     title="PDF Preview"
                                 />
@@ -390,7 +390,7 @@ export default function ContractsPage() {
                                         Este tipo de arquivo ({previewFile.type}) não pode ser visualizado diretamente no navegador.
                                     </p>
                                     <a
-                                        href={`http://localhost:3000${previewFile.url}`}
+                                        href={`${import.meta.env.VITE_API_URL}${previewFile.url}`}
                                         download
                                         target="_blank"
                                         rel="noreferrer"

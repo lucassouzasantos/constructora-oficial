@@ -28,7 +28,7 @@ export default function QuotesPage() {
     const fetchQuotes = async () => {
         try {
             const token = localStorage.getItem('token');
-            const res = await fetch('http://localhost:3000/quotes', {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/quotes`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             if (res.status === 401) {
@@ -52,7 +52,7 @@ export default function QuotesPage() {
         if (!confirm('Tem certeza que deseja excluir este orçamento?')) return;
         try {
             const token = localStorage.getItem('token');
-            await fetch(`http://localhost:3000/quotes/${id}`, {
+            await fetch(`${import.meta.env.VITE_API_URL}/quotes/${id}`, {
                 method: 'DELETE',
                 headers: { 'Authorization': `Bearer ${token}` }
             });
@@ -65,7 +65,7 @@ export default function QuotesPage() {
     const handleDuplicate = async (id: number) => {
         try {
             const token = localStorage.getItem('token');
-            const res = await fetch(`http://localhost:3000/quotes/${id}/duplicate`, {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/quotes/${id}/duplicate`, {
                 method: 'POST',
                 headers: { 'Authorization': `Bearer ${token}` }
             });
@@ -81,7 +81,7 @@ export default function QuotesPage() {
         if (!confirm('Deseja converter este orçamento em uma nova Obra?')) return;
         try {
             const token = localStorage.getItem('token');
-            const res = await fetch(`http://localhost:3000/quotes/${id}/convert`, {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/quotes/${id}/convert`, {
                 method: 'POST',
                 headers: { 'Authorization': `Bearer ${token}` }
             });

@@ -43,7 +43,7 @@ export default function QuoteEditorPage() {
 
     const fetchCustomers = async () => {
         const token = localStorage.getItem('token');
-        const res = await fetch('http://localhost:3000/customers', {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/customers`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
         if (res.status === 401) {
@@ -57,7 +57,7 @@ export default function QuoteEditorPage() {
 
     const fetchQuote = async () => {
         const token = localStorage.getItem('token');
-        const res = await fetch(`http://localhost:3000/quotes/${id}`, {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/quotes/${id}`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
         if (res.status === 401) {
@@ -94,7 +94,7 @@ export default function QuoteEditorPage() {
     const handleSave = async () => {
         try {
             const token = localStorage.getItem('token');
-            const url = isEditing ? `http://localhost:3000/quotes/${id}` : 'http://localhost:3000/quotes';
+            const url = isEditing ? `${import.meta.env.VITE_API_URL}/quotes/${id}` : `${import.meta.env.VITE_API_URL}/quotes`;
             const method = isEditing ? 'PATCH' : 'POST';
 
             const payload = {

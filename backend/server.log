@@ -219,3 +219,67 @@ Stack: UnauthorizedException: Unauthorized
     at getSecret (C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\jsonwebtoken\verify.js:97:14)
     at module.exports [as verify] (C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\jsonwebtoken\verify.js:101:10)
 
+[2026-03-27T18:12:51.332Z] GET /projects - Status: 500 - Error: {"name":"PrismaClientKnownRequestError","code":"P1001","clientVersion":"5.22.0","meta":{"modelName":"Project","database_host":"aws-0-us-west-2.pooler.supabase.com","database_port":6543}}
+Stack: PrismaClientKnownRequestError: 
+Invalid `this.prisma.project.findMany()` invocation in
+C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\src\projects\projects.service.ts:27:32
+
+  24 }
+  25 
+  26 findAll() {
+→ 27   return this.prisma.project.findMany(
+Can't reach database server at `aws-0-us-west-2.pooler.supabase.com:6543`
+
+Please make sure your database server is running at `aws-0-us-west-2.pooler.supabase.com:6543`.
+    at $n.handleRequestError (C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\@prisma\client\runtime\library.js:121:7315)
+    at $n.handleAndLogRequestError (C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\@prisma\client\runtime\library.js:121:6623)
+    at $n.request (C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\@prisma\client\runtime\library.js:121:6307)
+    at async l (C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\@nestjs\core\router\router-execution-context.js:46:28
+    at async C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\@nestjs\core\router\router-proxy.js:9:17
+
+[2026-03-27T18:12:51.346Z] GET /customers - Status: 500 - Error: {"name":"PrismaClientKnownRequestError","code":"P1001","clientVersion":"5.22.0","meta":{"modelName":"Customer","database_host":"aws-0-us-west-2.pooler.supabase.com","database_port":6543}}
+Stack: PrismaClientKnownRequestError: 
+Invalid `this.prisma.customer.findMany()` invocation in
+C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\src\customers\customers.service.ts:17:33
+
+  14 }
+  15 
+  16 findAll() {
+→ 17   return this.prisma.customer.findMany(
+Can't reach database server at `aws-0-us-west-2.pooler.supabase.com:6543`
+
+Please make sure your database server is running at `aws-0-us-west-2.pooler.supabase.com:6543`.
+    at $n.handleRequestError (C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\@prisma\client\runtime\library.js:121:7315)
+    at $n.handleAndLogRequestError (C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\@prisma\client\runtime\library.js:121:6623)
+    at $n.request (C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\@prisma\client\runtime\library.js:121:6307)
+    at async l (C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\@prisma\client\runtime\library.js:130:9633)
+    at async C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\@nestjs\core\router\router-execution-context.js:46:28
+    at async C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\@nestjs\core\router\router-proxy.js:9:17
+
+[2026-03-31T16:39:21.977Z] GET /quotes - Status: 401 - Error: {"message":"Unauthorized","statusCode":401}
+Stack: UnauthorizedException: Unauthorized
+    at MixinAuthGuard.handleRequest (C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\@nestjs\passport\dist\auth.guard.js:60:30)
+    at C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\@nestjs\passport\dist\auth.guard.js:44:124
+    at C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\@nestjs\passport\dist\auth.guard.js:83:24
+    at allFailed (C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\passport\lib\middleware\authenticate.js:110:18)
+    at attempt (C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\passport\lib\middleware\authenticate.js:183:28)
+    at strategy.fail (C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\passport\lib\middleware\authenticate.js:314:9)
+    at C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\passport-jwt\lib\strategy.js:106:33
+    at C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\jsonwebtoken\verify.js:190:16
+    at getSecret (C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\jsonwebtoken\verify.js:97:14)
+    at module.exports [as verify] (C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\jsonwebtoken\verify.js:101:10)
+
+[2026-03-31T16:39:21.992Z] GET /quotes - Status: 401 - Error: {"message":"Unauthorized","statusCode":401}
+Stack: UnauthorizedException: Unauthorized
+    at MixinAuthGuard.handleRequest (C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\@nestjs\passport\dist\auth.guard.js:60:30)
+    at C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\@nestjs\passport\dist\auth.guard.js:44:124
+    at C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\@nestjs\passport\dist\auth.guard.js:83:24
+    at allFailed (C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\passport\lib\middleware\authenticate.js:110:18)
+    at attempt (C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\passport\lib\middleware\authenticate.js:183:28)
+    at strategy.fail (C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\passport\lib\middleware\authenticate.js:314:9)
+    at C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\passport-jwt\lib\strategy.js:106:33
+    at C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\jsonwebtoken\verify.js:190:16
+    at getSecret (C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\jsonwebtoken\verify.js:97:14)
+    at module.exports [as verify] (C:\Users\lucassouza\Documents\sistema construtora\constructora-repo\backend\node_modules\jsonwebtoken\verify.js:101:10)
+

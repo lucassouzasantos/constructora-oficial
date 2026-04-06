@@ -52,7 +52,7 @@ export default function InventoryManager() {
 
     const fetchItems = async () => {
         try {
-            const response = await fetch(`http://localhost:3000/inventory?t=${new Date().getTime()}`);
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/inventory?t=${new Date().getTime()}`);
             const data = await response.json();
             setItems(data);
         } catch (error) {
@@ -64,7 +64,7 @@ export default function InventoryManager() {
 
     const fetchProjects = async () => {
         try {
-            const response = await fetch('http://localhost:3000/projects');
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/projects`);
             const data = await response.json();
             setProjects(data);
         } catch (error) {
@@ -102,7 +102,7 @@ export default function InventoryManager() {
     const handleDelete = async (id: number) => {
         if (!window.confirm('Tem certeza que deseja excluir este item do estoque?')) return;
         try {
-            await fetch(`http://localhost:3000/inventory/${id}`, { method: 'DELETE' });
+            await fetch(`${import.meta.env.VITE_API_URL}/inventory/${id}`, { method: 'DELETE' });
             fetchItems();
         } catch (error) {
             console.error('Error deleting item:', error);
@@ -111,7 +111,7 @@ export default function InventoryManager() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        const url = editingItem ? `http://localhost:3000/inventory/${editingItem.id}` : 'http://localhost:3000/inventory';
+        const url = editingItem ? `${import.meta.env.VITE_API_URL}/inventory/${editingItem.id}` : `${import.meta.env.VITE_API_URL}/inventory`;
         const method = editingItem ? 'PATCH' : 'POST';
 
         const payload = {

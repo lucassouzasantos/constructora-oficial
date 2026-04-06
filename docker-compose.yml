@@ -1,15 +1,26 @@
 version: '3.8'
+
 services:
-  postgres:
-    image: postgres:15
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: construction_db
-      POSTGRES_HOST_AUTH_METHOD: trust
+  backend:
+    build:
+      context: ./backend
+    container_name: constructora-backend
     ports:
-      - '5433:5432'
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-volumes:
-  postgres_data:
+      - "3000:3000"
+    env_file:
+      # Puxa o arquivo .env de dentro da pasta backend com a senha do Supabase
+      - ./backend/.env
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        # Puxa a VITE_API_URL. O cliente da EC2 deve criar um arquivo .env na raiz do projeto com o IP Público dele (ex: http://192.168.0.1:3000)
+        - VITE_API_URL=${VITE_API_URL}
+    container_name: constructora-frontend
+    ports:
+      - "80:80"
+    restart: unless-stopped
+    depends_on:
+      - backend

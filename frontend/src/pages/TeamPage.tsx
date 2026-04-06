@@ -33,7 +33,7 @@ export default function TeamPage() {
 
     const fetchWorkers = async () => {
         try {
-            const response = await fetch('http://localhost:3000/workers');
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/workers`);
             const data = await response.json();
             setWorkers(data);
         } catch (error) {
@@ -47,8 +47,8 @@ export default function TeamPage() {
         e.preventDefault();
         try {
             const url = editingId
-                ? `http://localhost:3000/workers/${editingId}`
-                : 'http://localhost:3000/workers';
+                ? `${import.meta.env.VITE_API_URL}/workers/${editingId}`
+                : `${import.meta.env.VITE_API_URL}/workers`;
 
             const method = editingId ? 'PATCH' : 'POST';
 
@@ -70,7 +70,7 @@ export default function TeamPage() {
     const handleDelete = async (id: number) => {
         if (!confirm('Desativar colaborador?')) return;
         try {
-            await fetch(`http://localhost:3000/workers/${id}`, { method: 'DELETE' });
+            await fetch(`${import.meta.env.VITE_API_URL}/workers/${id}`, { method: 'DELETE' });
             fetchWorkers();
         } catch (error) {
             console.error('Error deleting worker:', error);

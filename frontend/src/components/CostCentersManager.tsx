@@ -30,7 +30,7 @@ export default function CostCentersManager({ onLaunchExpense }: CostCentersManag
     const fetchItems = async () => {
         setLoading(true);
         try {
-            const response = await fetch('http://localhost:3000/cost-centers');
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/cost-centers`);
             const data = await response.json();
             setItems(data);
         } catch (error) {
@@ -44,8 +44,8 @@ export default function CostCentersManager({ onLaunchExpense }: CostCentersManag
         e.preventDefault();
         const method = editingId ? 'PATCH' : 'POST';
         const url = editingId
-            ? `http://localhost:3000/cost-centers/${editingId}`
-            : 'http://localhost:3000/cost-centers';
+            ? `${import.meta.env.VITE_API_URL}/cost-centers/${editingId}`
+            : `${import.meta.env.VITE_API_URL}/cost-centers`;
 
         try {
             await fetch(url, {
@@ -65,7 +65,7 @@ export default function CostCentersManager({ onLaunchExpense }: CostCentersManag
     const handleDelete = async (id: number) => {
         if (!confirm('Eliminar centro de custos?')) return;
         try {
-            await fetch(`http://localhost:3000/cost-centers/${id}`, { method: 'DELETE' });
+            await fetch(`${import.meta.env.VITE_API_URL}/cost-centers/${id}`, { method: 'DELETE' });
             fetchItems();
         } catch (error) {
             console.error('Error deleting:', error);

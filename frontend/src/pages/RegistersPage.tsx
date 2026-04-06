@@ -50,7 +50,7 @@ export default function RegistersPage({ type = 'ALL', hideHeader }: RegistersPag
         setLoading(true);
         const endpoint = activeTab === 'SUPPLIERS' ? 'suppliers' : 'customers';
         try {
-            const response = await fetch(`http://localhost:3000/${endpoint}`);
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/${endpoint}`);
             const data = await response.json();
             setItems(data);
         } catch (error) {
@@ -65,8 +65,8 @@ export default function RegistersPage({ type = 'ALL', hideHeader }: RegistersPag
         const endpoint = activeTab === 'SUPPLIERS' ? 'suppliers' : 'customers';
         const method = editingId ? 'PATCH' : 'POST';
         const url = editingId
-            ? `http://localhost:3000/${endpoint}/${editingId}`
-            : `http://localhost:3000/${endpoint}`;
+            ? `${import.meta.env.VITE_API_URL}/${endpoint}/${editingId}`
+            : `${import.meta.env.VITE_API_URL}/${endpoint}`;
 
         try {
             await fetch(url, {
@@ -87,7 +87,7 @@ export default function RegistersPage({ type = 'ALL', hideHeader }: RegistersPag
         if (!confirm('Eliminar registro?')) return;
         const endpoint = activeTab === 'SUPPLIERS' ? 'suppliers' : 'customers';
         try {
-            const response = await fetch(`http://localhost:3000/${endpoint}/${id}`, { method: 'DELETE' });
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/${endpoint}/${id}`, { method: 'DELETE' });
             if (!response.ok) {
                 const data = await response.json();
                 alert(data.message || 'Erro ao eliminar. Verifique se existem transações vinculadas.');

@@ -66,7 +66,7 @@ export default function TransactionModal({ isOpen, onClose, onSave, type, initia
     const fetchEntities = async () => {
         const endpoint = type === 'EXPENSE' ? 'suppliers' : 'customers';
         try {
-            const response = await fetch(`http://localhost:3000/${endpoint}`);
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/${endpoint}`);
             const data = await response.json();
             if (Array.isArray(data)) {
                 setEntities(data);
@@ -78,7 +78,7 @@ export default function TransactionModal({ isOpen, onClose, onSave, type, initia
 
     const fetchProjects = async () => {
         try {
-            const response = await fetch('http://localhost:3000/projects');
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/projects`);
             const data = await response.json();
             if (Array.isArray(data)) {
                 setProjects(data);
@@ -90,7 +90,7 @@ export default function TransactionModal({ isOpen, onClose, onSave, type, initia
 
     const fetchCostCenters = async () => {
         try {
-            const response = await fetch('http://localhost:3000/cost-centers');
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/cost-centers`);
             const data = await response.json();
             if (Array.isArray(data)) {
                 setCostCenters(data.filter((cc: any) => cc.active));
