@@ -16,8 +16,8 @@ services:
     build:
       context: ./frontend
       args:
-        # Puxa a VITE_API_URL. O cliente da EC2 deve criar um arquivo .env na raiz do projeto com o IP Público dele (ex: http://192.168.0.1:3000)
-        - VITE_API_URL=${VITE_API_URL}
+        # Configuração de Proxy Reverso ativada: o Frontend vai bater no atalho /api internamente
+        - VITE_API_URL=/api
     container_name: constructora-frontend
     ports:
       - "80:80"
