@@ -128,7 +128,8 @@ export default function TeamPage() {
                 </div>
 
                 <div className="overflow-x-auto">
-                    <table className="w-full text-left">
+                    <div className="overflow-x-auto w-full pb-4">
+<table className="w-full text-left">
                         <thead className="bg-slate-50 border-b border-slate-100">
                             <tr>
                                 <th className="px-6 py-4 font-semibold text-slate-700 text-sm">Colaborador</th>
@@ -186,6 +187,7 @@ export default function TeamPage() {
                             )}
                         </tbody>
                     </table>
+</div>
                 </div>
             </div>
 

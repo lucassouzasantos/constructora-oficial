@@ -144,7 +144,7 @@ export default function QuotesPage() {
 
             <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
                 <div className="p-4 border-b border-slate-100 bg-slate-50/50 flex flex-col sm:flex-row gap-4 justify-between items-center">
-                    <div className="relative w-full sm:w-96">
+                    <div className="relative w-full sm:w-full max-w-md mx-4">
                         <Search className="w-5 h-5 text-slate-400 absolute left-3 top-1/2 transform -translate-y-1/2" />
                         <input
                             type="text"
@@ -157,7 +157,8 @@ export default function QuotesPage() {
                 </div>
 
                 <div className="overflow-x-auto">
-                    <table className="w-full text-sm text-left">
+                    <div className="overflow-x-auto w-full pb-4">
+<table className="w-full text-sm text-left">
                         <thead className="text-xs text-slate-500 uppercase bg-slate-50 border-b border-slate-100">
                             <tr>
                                 <th className="px-6 py-4 font-medium">Orçamento</th>
@@ -246,6 +247,7 @@ export default function QuotesPage() {
                             )}
                         </tbody>
                     </table>
+</div>
                 </div>
             </div>
         </div>

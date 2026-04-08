@@ -294,7 +294,8 @@ export default function ReportsPage() {
                     <h3 className="text-lg font-bold text-slate-800">Demonstrativo de Resultados (DRE)</h3>
                 </div>
                 <div className="overflow-x-auto">
-                    <table className="w-full text-sm text-left">
+                    <div className="overflow-x-auto w-full pb-4">
+<table className="w-full text-sm text-left">
                         <thead className="bg-[#f8fafc] text-slate-500 uppercase text-xs font-semibold tracking-wider">
                             <tr>
                                 <th className="px-6 py-4">Período</th>
@@ -327,6 +328,7 @@ export default function ReportsPage() {
                             )}
                         </tbody>
                     </table>
+</div>
                 </div>
             </div>
         </div>

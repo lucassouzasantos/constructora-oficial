@@ -686,7 +686,8 @@ export default function ProjectDetailsPage() {
                             </button>
                         </div>
                         <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-                            <table className="w-full text-left">
+                            <div className="overflow-x-auto w-full pb-4">
+<table className="w-full text-left">
                                 <thead className="bg-slate-50 border-b border-slate-100">
                                     <tr>
                                         <th className="px-6 py-4 font-semibold text-slate-700 text-sm">Data</th>
@@ -731,6 +732,7 @@ export default function ProjectDetailsPage() {
                                     )}
                                 </tbody>
                             </table>
+</div>
                         </div>
                     </div>
                 )}
@@ -747,7 +749,8 @@ export default function ProjectDetailsPage() {
                             </button>
                         </div>
                         <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-                            <table className="w-full text-left">
+                            <div className="overflow-x-auto w-full pb-4">
+<table className="w-full text-left">
                                 <thead className="bg-slate-50 border-b border-slate-100">
                                     <tr>
                                         <th className="px-6 py-4 font-semibold text-slate-700 text-sm">Data</th>
@@ -790,6 +793,7 @@ export default function ProjectDetailsPage() {
                                     )}
                                 </tbody>
                             </table>
+</div>
                         </div>
                     </div>
                 )}
@@ -823,7 +827,8 @@ export default function ProjectDetailsPage() {
                         </div>
 
                         <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-                            <table className="w-full text-left">
+                            <div className="overflow-x-auto w-full pb-4">
+<table className="w-full text-left">
                                 <thead className="bg-slate-50 border-b border-slate-100">
                                     <tr>
                                         <th className="px-6 py-4 font-semibold text-slate-700 text-sm">Data</th>
@@ -876,6 +881,7 @@ export default function ProjectDetailsPage() {
                                     )}
                                 </tbody>
                             </table>
+</div>
                         </div>
                     </div>
                 )}

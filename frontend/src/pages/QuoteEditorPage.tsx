@@ -388,7 +388,8 @@ export default function QuoteEditorPage() {
                                                 />
                                             </div>
 
-                                            <table className="w-full text-sm text-left mb-4">
+                                            <div className="overflow-x-auto w-full pb-4">
+<table className="w-full text-sm text-left mb-4">
                                                 <thead className="text-xs text-slate-500 uppercase border-b border-slate-100">
                                                     <tr>
                                                         <th className="pb-2 font-medium w-1/2">Item / Descrição</th>
@@ -426,6 +427,7 @@ export default function QuoteEditorPage() {
                                                     ))}
                                                 </tbody>
                                             </table>
+</div>
 
                                             <button
                                                 onClick={() => addItem(sIdx)}
@@ -599,7 +601,7 @@ export default function QuoteEditorPage() {
 
             {/* ----- HIDDEN PREVIEW FOR PDF GENERATION ----- */}
             <div style={{ position: 'absolute', left: '-9999px', top: '-9999px' }}>
-                <div ref={proposalRef} className="w-[800px]" style={{ fontFamily: 'sans-serif', backgroundColor: '#ffffff', color: '#1e293b' }}>
+                <div ref={proposalRef} className="w-full max-w-lg sm:max-w-xl mx-4" style={{ fontFamily: 'sans-serif', backgroundColor: '#ffffff', color: '#1e293b' }}>
 
                     {/* --- COVER PAGE --- */}
                     <div style={{ height: '1130px', position: 'relative', overflow: 'hidden', backgroundColor: '#ffffff' }}>
@@ -670,7 +672,8 @@ export default function QuoteEditorPage() {
                         {/* Simple Stages Table */}
                         <div className="mb-8">
                             <h2 className="text-lg font-bold mb-4 pb-2" style={{ color: '#1e293b', borderBottom: '1px solid #e2e8f0' }}>Resumo de Serviços e Valores</h2>
-                            <table className="w-full text-left" style={{ borderCollapse: 'collapse' }}>
+                            <div className="overflow-x-auto w-full pb-4">
+<table className="w-full text-left" style={{ borderCollapse: 'collapse' }}>
                                 <thead className="text-xs uppercase" style={{ backgroundColor: '#f8fafc', color: '#64748b' }}>
                                     <tr>
                                         <th className="py-3 px-4 font-semibold">Etapa / Serviço</th>
@@ -722,6 +725,7 @@ export default function QuoteEditorPage() {
                                     })}
                                 </tbody>
                             </table>
+</div>
 
                             <div className="flex justify-end mt-4">
                                 <div className="p-4 rounded-lg w-1/2" style={{ backgroundColor: '#f1f5f9' }}>

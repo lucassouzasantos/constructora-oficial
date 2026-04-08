@@ -167,7 +167,8 @@ export default function RegistersPage({ type = 'ALL', hideHeader }: RegistersPag
                 </div>
 
                 <div className="overflow-x-auto">
-                    <table className="w-full text-sm text-left">
+                    <div className="overflow-x-auto w-full pb-4">
+<table className="w-full text-sm text-left">
                         <thead className="text-xs text-slate-500 uppercase bg-slate-50 border-b border-slate-100">
                             <tr>
                                 <th className="px-6 py-3 font-medium">Nome</th>
@@ -207,6 +208,7 @@ export default function RegistersPage({ type = 'ALL', hideHeader }: RegistersPag
                             )}
                         </tbody>
                     </table>
+</div>
                 </div>
             </div>
 
