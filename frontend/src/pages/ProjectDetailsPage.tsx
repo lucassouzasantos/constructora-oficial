@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft, Plus, Calendar, CheckCircle, Circle, Trash2, Battery, Edit, X } from 'lucide-react';
 import {
-    BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
+    BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ComposedChart, Line
 } from 'recharts';
 import CurrencyInput from '../components/CurrencyInput';
 
@@ -91,37 +91,71 @@ export default function ProjectDetailsPage() {
 
     // ... existing effects ...
 
-    const openMaterialModal = () => {
-        setFinanceFormData({
-            description: '',
-            amount: '',
-            status: 'PENDING',
-            dueDate: new Date().toISOString().split('T')[0],
-            category: 'MATERIAIS',
-            quantity: '',
-            unit: ''
-        });
+        const openMaterialModal = (finance?: any) => {
+        if (finance) {
+            setEditingFinance(finance);
+            setFinanceFormData({
+                description: finance.description,
+                amount: finance.amount.toString(),
+                status: finance.status,
+                dueDate: finance.dueDate ? finance.dueDate.split('T')[0] : new Date().toISOString().split('T')[0],
+                category: finance.category,
+                quantity: finance.quantity ? finance.quantity.toString() : '',
+                unit: finance.unit || ''
+            });
+        } else {
+            setEditingFinance(null);
+            setFinanceFormData({
+                description: '',
+                amount: '',
+                status: 'PENDING',
+                dueDate: new Date().toISOString().split('T')[0],
+                category: 'MATERIAIS',
+                quantity: '',
+                unit: ''
+            });
+        }
         setIsMaterialModalOpen(true);
     };
 
-    const openServiceModal = () => {
-        setFinanceFormData({
-            description: '',
-            amount: '',
-            status: 'PENDING',
-            dueDate: new Date().toISOString().split('T')[0],
-            category: 'MÃO_DE_OBRA',
-            quantity: '',
-            unit: ''
-        });
+        const openServiceModal = (finance?: any) => {
+        if (finance) {
+            setEditingFinance(finance);
+            setFinanceFormData({
+                description: finance.description,
+                amount: finance.amount.toString(),
+                status: finance.status,
+                dueDate: finance.dueDate ? finance.dueDate.split('T')[0] : new Date().toISOString().split('T')[0],
+                category: finance.category,
+                quantity: finance.quantity ? finance.quantity.toString() : '',
+                unit: finance.unit || ''
+            });
+        } else {
+            setEditingFinance(null);
+            setFinanceFormData({
+                description: '',
+                amount: '',
+                status: 'PENDING',
+                dueDate: new Date().toISOString().split('T')[0],
+                category: 'MÃO_DE_OBRA',
+                quantity: '',
+                unit: ''
+            });
+        }
         setIsServiceModalOpen(true);
     };
 
-    const handleFinanceSubmit = async (e: React.FormEvent) => {
+        const handleFinanceSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            await fetch(`${import.meta.env.VITE_API_URL}/finance`, {
-                method: 'POST',
+            const url = editingFinance 
+                ? `${import.meta.env.VITE_API_URL}/finance/${editingFinance.id}`
+                : `${import.meta.env.VITE_API_URL}/finance`;
+                
+            const method = editingFinance ? 'PATCH' : 'POST';
+
+            await fetch(url, {
+                method,
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     ...financeFormData,
@@ -133,16 +167,43 @@ export default function ProjectDetailsPage() {
             });
             setIsMaterialModalOpen(false);
             setIsServiceModalOpen(false);
+            setEditingFinance(null);
             fetchExpenses();
         } catch (error) {
-            console.error('Error creating finance entry:', error);
+            console.error('Error saving finance entry:', error);
         }
     };
+    
+    const getABCCurveData = () => {
+        const materials = expenses.filter(e => e.category === 'MATERIAIS');
+        const grouped: Record<string, number> = materials.reduce((acc, curr) => {
+            const desc = curr.description || 'Desconhecido';
+            if (!acc[desc]) acc[desc] = 0;
+            acc[desc] += Number(curr.amount);
+            return acc;
+        }, {} as Record<string, number>);
+        
+        let chartData = Object.keys(grouped).map(k => ({ name: k, value: grouped[k] }));
+        chartData.sort((a, b) => b.value - a.value);
+        
+        const total = chartData.reduce((sum, item) => sum + item.value, 0);
+        let cumulative = 0;
+        
+        return chartData.map(item => {
+            cumulative += item.value;
+            return {
+                ...item,
+                cumulativePercentage: total > 0 ? (cumulative / total) * 100 : 0
+            };
+        });
+    };
+
     const [isBudgetModalOpen, setIsBudgetModalOpen] = useState(false);
 
     // Editing states
     const [editingStage, setEditingStage] = useState<ProjectStage | null>(null);
     const [editingBudget, setEditingBudget] = useState<any | null>(null);
+    const [editingFinance, setEditingFinance] = useState<any | null>(null);
 
     const [formData, setFormData] = useState({
         name: '',
@@ -553,6 +614,29 @@ export default function ProjectDetailsPage() {
                 </div>
             </div>
 
+            
+            {/* ABC Curve for Materials */}
+            {getABCCurveData().length > 0 && (
+                <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200 mb-6">
+                    <div className="flex items-center justify-between mb-4"><h3 className="text-lg font-bold text-slate-800">Curva ABC de Materiais</h3><div className="flex items-center gap-2"><span className="w-3 h-3 rounded-full bg-blue-500"></span><span className="text-sm font-medium text-slate-600">Custo Total (G$)</span></div></div>
+                    <div className="h-[400px] w-full">
+                        <ResponsiveContainer width="100%" height="100%">
+                            <ComposedChart data={getABCCurveData()} margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
+                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                                <XAxis dataKey="name" angle={-45} textAnchor="end" height={60} tick={{ fontSize: 12 }} />
+                                <YAxis yAxisId="left" tickFormatter={(val) => formatCurrency(val).replace(',00', '')} tick={{ fontSize: 12 }} />
+                                <Tooltip 
+                                    formatter={(value: any) => [formatCurrency(Number(value)), 'Custo Total']}
+                                />
+                                
+                                <Bar yAxisId="left" dataKey="value" name="Custo Total (G$)" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+                                
+                            </ComposedChart>
+                        </ResponsiveContainer>
+                    </div>
+                </div>
+            )}
+
             {/* Materials and Services Section */}
             <div className="w-full space-y-6 pt-4 border-t border-slate-100">
                 <div className="flex items-center gap-4 bg-slate-50 p-1 rounded-xl w-fit">
@@ -714,7 +798,8 @@ export default function ProjectDetailsPage() {
                                             <td className="px-6 py-4 text-sm font-bold text-slate-900">
                                                 {formatCurrency(Number(item.amount))}
                                             </td>
-                                            <td className="px-6 py-4 text-right">
+                                            <td className="px-6 py-4 text-right flex justify-end gap-2">
+                                                <button onClick={() => openMaterialModal(item)} className="text-slate-400 hover:text-blue-500 transition-colors" title="Editar Lançamento"><Edit className="w-4 h-4" /></button>
                                                 <button
                                                     onClick={() => handleDeleteExpense(item.id)}
                                                     className="text-slate-400 hover:text-red-500 transition-colors"
@@ -775,7 +860,8 @@ export default function ProjectDetailsPage() {
                                             <td className="px-6 py-4 text-sm font-bold text-slate-900">
                                                 {formatCurrency(Number(item.amount))}
                                             </td>
-                                            <td className="px-6 py-4 text-right">
+                                            <td className="px-6 py-4 text-right flex justify-end gap-2">
+                                                <button onClick={() => openServiceModal(item)} className="text-slate-400 hover:text-blue-500 transition-colors" title="Editar Lançamento"><Edit className="w-4 h-4" /></button>
                                                 <button
                                                     onClick={() => handleDeleteExpense(item.id)}
                                                     className="text-slate-400 hover:text-red-500 transition-colors"
@@ -915,7 +1001,7 @@ export default function ProjectDetailsPage() {
                                                 <div key={cat} className="flex justify-between items-center text-sm group">
                                                     <div className="flex items-center gap-2">
                                                         <span className="text-slate-700 font-medium capitalize">{cat.replace(/_/g, ' ').toLowerCase()}</span>
-                                                        <div className="flex items-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                                        <div className="flex items-center opacity-100 transition-opacity">
                                                             <button
                                                                 onClick={() => openBudgetModal(item)}
                                                                 className="p-1 text-slate-400 hover:text-blue-500 transition-colors"
