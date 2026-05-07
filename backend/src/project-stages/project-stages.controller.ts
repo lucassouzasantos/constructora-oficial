@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { ProjectStagesService } from './project-stages.service';
 import { CreateProjectStageDto } from './dto/create-project-stage.dto';
 import { UpdateProjectStageDto } from './dto/update-project-stage.dto';
@@ -13,8 +13,8 @@ export class ProjectStagesController {
   }
 
   @Get()
-  findAll() {
-    return this.projectStagesService.findAll();
+  findAll(@Query('projectId') projectId?: string) {
+    return this.projectStagesService.findAll(projectId ? Number(projectId) : undefined);
   }
 
   @Get(':id')
