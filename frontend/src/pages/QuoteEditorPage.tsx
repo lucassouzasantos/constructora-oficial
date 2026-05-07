@@ -601,7 +601,7 @@ export default function QuoteEditorPage() {
 
             {/* ----- HIDDEN PREVIEW FOR PDF GENERATION ----- */}
             <div style={{ position: 'absolute', left: '-9999px', top: '-9999px' }}>
-                <div ref={proposalRef} className="w-full max-w-lg sm:max-w-xl mx-4" style={{ fontFamily: 'sans-serif', backgroundColor: '#ffffff', color: '#1e293b' }}>
+                <div ref={proposalRef} style={{ width: '800px', fontFamily: 'sans-serif', backgroundColor: '#ffffff', color: '#1e293b' }}>
 
                     {/* --- COVER PAGE --- */}
                     <div style={{ height: '1130px', position: 'relative', overflow: 'hidden', backgroundColor: '#ffffff' }}>
@@ -709,8 +709,8 @@ export default function QuoteEditorPage() {
                                                                 return (
                                                                     <div key={iIdx} className="text-xs flex justify-between items-start py-0.5" style={{ color: '#475569' }}>
                                                                         <span className="flex-1 leading-snug pr-2">• {item.description || 'Item sem descrição'}</span>
-                                                                        <span className="w-16 text-right whitespace-nowrap">{item.quantity} {item.unit}</span>
-                                                                        <span className="w-24 text-right whitespace-nowrap font-medium pl-2">{formatCurrency(itemFinalPrice)}</span>
+                                                                        <span style={{ minWidth: '60px', textAlign: 'right', whiteSpace: 'nowrap' }}>{item.quantity} {item.unit}</span>
+                                                                        <span style={{ minWidth: '110px', textAlign: 'right', whiteSpace: 'nowrap', fontWeight: 600, paddingLeft: '8px' }}>{formatCurrency(itemFinalPrice)}</span>
                                                                     </div>
                                                                 );
                                                             })}
@@ -728,13 +728,13 @@ export default function QuoteEditorPage() {
 </div>
 
                             <div className="flex justify-end mt-4">
-                                <div className="p-4 rounded-lg w-1/2" style={{ backgroundColor: '#f1f5f9' }}>
-                                    <div className="flex justify-between items-center text-lg font-bold" style={{ color: '#1e293b' }}>
-                                        <span>Total Geral Final:</span>
-                                        <span style={{ color: '#16a34a' }}>{formatCurrency(finalPrice)}</span>
+                                <div className="p-4 rounded-lg" style={{ backgroundColor: '#f1f5f9', minWidth: '360px' }}>
+                                    <div className="flex justify-between items-center gap-8 text-lg font-bold" style={{ color: '#1e293b' }}>
+                                        <span style={{ whiteSpace: 'nowrap' }}>Total Geral Final:</span>
+                                        <span style={{ color: '#16a34a', whiteSpace: 'nowrap' }}>{formatCurrency(finalPrice)}</span>
                                     </div>
                                     {formData.totalArea > 0 && (
-                                        <div className="flex justify-end text-sm mt-1" style={{ color: '#64748b' }}>
+                                        <div className="flex justify-end text-sm mt-1" style={{ color: '#64748b', whiteSpace: 'nowrap' }}>
                                             {formatCurrency(finalPrice / formData.totalArea)} / m²
                                         </div>
                                     )}
