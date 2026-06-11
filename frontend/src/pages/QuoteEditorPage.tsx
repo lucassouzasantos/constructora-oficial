@@ -4,6 +4,7 @@ import { Save, FileDown, Plus, Trash2, ChevronDown, ChevronRight, Calculator } f
 import { toCanvas } from 'html-to-image';
 import { jsPDF } from 'jspdf';
 import { formatCurrency } from '../utils/format';
+import { api } from '../utils/api';
 
 export default function QuoteEditorPage() {
     const { id } = useParams();
@@ -42,45 +43,31 @@ export default function QuoteEditorPage() {
     }, [id]);
 
     const fetchCustomers = async () => {
-        const token = localStorage.getItem('token');
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/customers`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
-        if (res.status === 401) {
-            localStorage.removeItem('token');
-            localStorage.removeItem('user');
-            navigate('/login');
-            return;
+        try {
+            const data = await api.get<any[]>('/customers');
+            setCustomers(data);
+        } catch (error) {
+            console.error('Error fetching customers:', error);
         }
-        if (res.ok) setCustomers(await res.json());
     };
 
     const fetchQuote = async () => {
-        const token = localStorage.getItem('token');
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/quotes/${id}`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
-        if (res.status === 401) {
-            localStorage.removeItem('token');
-            localStorage.removeItem('user');
-            navigate('/login');
-            return;
-        }
-        if (res.ok) {
-            const data = await res.json();
+        try {
+            const data = await api.get<any>(`/quotes/${id}`);
             setFormData({
                 ...data,
                 customerId: data.customerId || '',
                 stages: data.stages || [],
                 indirectCosts: data.indirectCosts || []
             });
-
-            // Expand all stages by default
             const expanded: Record<number, boolean> = {};
             data.stages.forEach((_: any, idx: number) => { expanded[idx] = true; });
             setExpandedStages(expanded);
+        } catch (error) {
+            console.error('Error fetching quote:', error);
+        } finally {
+            setLoading(false);
         }
-        setLoading(false);
     };
 
     const parseBrNumber = (val: any): number | undefined => {
@@ -93,10 +80,6 @@ export default function QuoteEditorPage() {
 
     const handleSave = async () => {
         try {
-            const token = localStorage.getItem('token');
-            const url = isEditing ? `${import.meta.env.VITE_API_URL}/quotes/${id}` : `${import.meta.env.VITE_API_URL}/quotes`;
-            const method = isEditing ? 'PATCH' : 'POST';
-
             const payload = {
                 ...formData,
                 customerId: formData.customerId ? Number(formData.customerId) : undefined,
@@ -117,41 +100,15 @@ export default function QuoteEditorPage() {
                 }))
             };
 
-            const res = await fetch(url, {
-                method,
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify(payload)
-            });
-
-            if (res.status === 401) {
-                localStorage.removeItem('token');
-                localStorage.removeItem('user');
-                navigate('/login');
-                return;
-            }
-
-            if (res.ok) {
-                navigate('/quotes');
+            if (isEditing) {
+                await api.patch(`/quotes/${id}`, payload);
             } else {
-                const errData = await res.json();
-                console.error('Validation errors:', errData);
-                // Handle NestJS double wrapped exception objects
-                let validationErrors = errData.message;
-                if (validationErrors && typeof validationErrors === 'object' && Array.isArray(validationErrors.message)) {
-                    validationErrors = validationErrors.message;
-                }
-
-                const msgs = Array.isArray(validationErrors)
-                    ? validationErrors.join('\n')
-                    : (typeof validationErrors === 'object' ? JSON.stringify(validationErrors) : validationErrors);
-
-                alert(`Erro ao salvar orçamento.\nDetalhes: ${msgs || 'Revise os campos obrigatórios.'}`);
+                await api.post('/quotes', payload);
             }
-        } catch (error) {
+            navigate('/quotes');
+        } catch (error: any) {
             console.error('Save error:', error);
+            alert(`Erro ao salvar orçamento.\nDetalhes: ${error?.message || 'Revise os campos obrigatórios.'}`);
         }
     };
 

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Settings, Plus, Edit, Trash2, Shield, User as UserIcon, X, Check } from 'lucide-react';
+import { Plus, Edit, Trash2, Shield, X, Check } from 'lucide-react';
+import { api } from '../utils/api';
 
 interface User {
     id: number;
@@ -21,6 +22,7 @@ export default function AdminPage() {
         role: 'USER'
     });
     const [editingUserId, setEditingUserId] = useState<number | null>(null);
+    const [deletingId, setDeletingId] = useState<number | null>(null);
 
     const currentUserStr = localStorage.getItem('user');
     const currentUser = currentUserStr ? JSON.parse(currentUserStr) : null;
@@ -31,14 +33,8 @@ export default function AdminPage() {
 
     const fetchUsers = async () => {
         try {
-            const token = localStorage.getItem('token');
-            const res = await fetch(`${import.meta.env.VITE_API_URL}/users`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-            if (res.ok) {
-                const data = await res.json();
-                setUsers(data);
-            }
+            const data = await api.get<User[]>('/users');
+            setUsers(data);
         } catch (error) {
             console.error('Error fetching users:', error);
         } finally {
@@ -65,53 +61,33 @@ export default function AdminPage() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            const token = localStorage.getItem('token');
-            const url = editingUserId
-                ? `${import.meta.env.VITE_API_URL}/users/${editingUserId}`
-                : `${import.meta.env.VITE_API_URL}/users`;
-            const method = editingUserId ? 'PATCH' : 'POST';
-
             const payload: any = { ...formData };
-            if (!payload.password) delete payload.password; // Do not send empty password on update
+            if (!payload.password) delete payload.password;
 
-            const res = await fetch(url, {
-                method,
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify(payload)
-            });
-
-            if (res.ok) {
-                setIsModalOpen(false);
-                fetchUsers();
+            if (editingUserId) {
+                await api.patch(`/users/${editingUserId}`, payload);
             } else {
-                const err = await res.json().catch(() => ({}));
-                let errorMessage = 'Falha ao salvar usuário.';
-                if (err.message) {
-                    // Nest validation errors come as array of strings
-                    errorMessage = Array.isArray(err.message) ? err.message.join('\n') : err.message;
-                }
-                alert(`Erro ao salvar usuário:\n${errorMessage}`);
+                await api.post('/users', payload);
             }
-        } catch (error) {
+            setIsModalOpen(false);
+            fetchUsers();
+        } catch (error: any) {
             console.error('Error saving user:', error);
-            alert('Erro de rede ao salvar usuário. Verifique a conexão.');
+            const msg = error?.message || 'Erro ao salvar usuário.';
+            alert(`Erro ao salvar usuário:\n${msg}`);
         }
     };
 
     const handleDelete = async (id: number) => {
         if (!confirm('Tem certeza que deseja excluir o usuário?')) return;
+        setDeletingId(id);
         try {
-            const token = localStorage.getItem('token');
-            await fetch(`${import.meta.env.VITE_API_URL}/users/${id}`, {
-                method: 'DELETE',
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
+            await api.delete(`/users/${id}`);
             fetchUsers();
         } catch (error) {
             console.error('Error deleting user:', error);
+        } finally {
+            setDeletingId(null);
         }
     };
 
@@ -191,7 +167,8 @@ export default function AdminPage() {
                                             {currentUser.id !== user.id && (
                                                 <button
                                                     onClick={() => handleDelete(user.id)}
-                                                    className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                                                    disabled={deletingId === user.id}
+                                                    className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                                     title="Excluir Usuário"
                                                 >
                                                     <Trash2 className="w-4 h-4" />

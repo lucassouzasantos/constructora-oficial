@@ -1,12 +1,14 @@
 import { Controller, Get, Post, Body, Param, Delete, Query } from '@nestjs/common';
 import { WorkLogsService } from './work-logs.service';
 import { CreateWorkLogDto } from './dto/work-log.dto';
+import { Roles } from '../auth/decorators/roles.decorator';
 
 @Controller('work-logs')
 export class WorkLogsController {
     constructor(private readonly workLogsService: WorkLogsService) { }
 
     @Post()
+    @Roles('ADMIN', 'MANAGER', 'USER')
     create(@Body() createWorkLogDto: CreateWorkLogDto) {
         return this.workLogsService.create(createWorkLogDto);
     }
@@ -23,6 +25,7 @@ export class WorkLogsController {
     }
 
     @Delete(':id')
+    @Roles('ADMIN', 'MANAGER')
     remove(@Param('id') id: string) {
         return this.workLogsService.remove(+id);
     }

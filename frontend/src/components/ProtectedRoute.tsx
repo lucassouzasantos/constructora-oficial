@@ -1,12 +1,21 @@
 
 import { Navigate, Outlet } from 'react-router-dom';
 
+function isTokenExpired(token: string): boolean {
+    try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        return payload.exp * 1000 < Date.now();
+    } catch {
+        return true;
+    }
+}
+
 export default function ProtectedRoute() {
     const token = localStorage.getItem('token');
 
-    // Simple check for token existence. 
-    // Ideally, we should verify validity or expiration, but this suffices for basic routing protection.
-    if (!token) {
+    if (!token || isTokenExpired(token)) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
         return <Navigate to="/login" replace />;
     }
 

@@ -54,14 +54,7 @@ export class ProjectsService {
     });
   }
 
-  async remove(id: number) {
-    try {
-      return await this.prisma.project.delete({
-        where: { id },
-      });
-    } catch (error) {
-      // Typically projects don't have constraints yet, but good practice
-      throw error;
-    }
+  remove(id: number) {
+    return this.prisma.project.delete({ where: { id } });
   }
 }

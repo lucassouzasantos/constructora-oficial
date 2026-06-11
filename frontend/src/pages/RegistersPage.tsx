@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Pencil, Search, Plus, Building, Users, Trash2 } from 'lucide-react';
+import { api } from '../utils/api';
 
 interface Supplier {
     id: number;
@@ -50,8 +51,7 @@ export default function RegistersPage({ type = 'ALL', hideHeader }: RegistersPag
         setLoading(true);
         const endpoint = activeTab === 'SUPPLIERS' ? 'suppliers' : 'customers';
         try {
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/${endpoint}`);
-            const data = await response.json();
+            const data = await api.get<any[]>(`/${endpoint}`);
             setItems(data);
         } catch (error) {
             console.error('Error fetching data:', error);
@@ -63,17 +63,12 @@ export default function RegistersPage({ type = 'ALL', hideHeader }: RegistersPag
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         const endpoint = activeTab === 'SUPPLIERS' ? 'suppliers' : 'customers';
-        const method = editingId ? 'PATCH' : 'POST';
-        const url = editingId
-            ? `${import.meta.env.VITE_API_URL}/${endpoint}/${editingId}`
-            : `${import.meta.env.VITE_API_URL}/${endpoint}`;
-
         try {
-            await fetch(url, {
-                method,
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(formData),
-            });
+            if (editingId) {
+                await api.patch(`/${endpoint}/${editingId}`, formData);
+            } else {
+                await api.post(`/${endpoint}`, formData);
+            }
             setIsModalOpen(false);
             setEditingId(null);
             setFormData({});
@@ -87,16 +82,10 @@ export default function RegistersPage({ type = 'ALL', hideHeader }: RegistersPag
         if (!confirm('Eliminar registro?')) return;
         const endpoint = activeTab === 'SUPPLIERS' ? 'suppliers' : 'customers';
         try {
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/${endpoint}/${id}`, { method: 'DELETE' });
-            if (!response.ok) {
-                const data = await response.json();
-                alert(data.message || 'Erro ao eliminar. Verifique se existem transações vinculadas.');
-                return;
-            }
+            await api.delete(`/${endpoint}/${id}`);
             fetchItems();
         } catch (error) {
             console.error('Error deleting:', error);
-            alert('Erro ao eliminar registro.');
         }
     };
 

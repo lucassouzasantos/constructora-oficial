@@ -1,6 +1,10 @@
 import { toast } from 'sonner';
 
-const BASE_URL = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_URL;
+const BASE_URL = import.meta.env.VITE_API_URL;
+
+if (!BASE_URL) {
+    throw new Error('VITE_API_URL não definida. Configure a variável de ambiente no .env ou nas configurações do Vercel/Railway.');
+}
 
 interface RequestOptions extends RequestInit {
     skipGlobalErrorToast?: boolean;
@@ -10,11 +14,11 @@ async function fetchWrapper<T>(endpoint: string, options: RequestOptions = {}): 
     const { skipGlobalErrorToast, ...customConfig } = options;
 
     const token = localStorage.getItem('token');
+    const isFormData = customConfig.body instanceof FormData;
 
-    // Add default headers unless overridden
     const headers: Record<string, string> = {
-        'Content-Type': 'application/json',
-        ...customConfig.headers as any,
+        ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
+        ...(customConfig.headers as Record<string, string>),
     };
 
     if (token) {
@@ -36,7 +40,6 @@ async function fetchWrapper<T>(endpoint: string, options: RequestOptions = {}): 
             throw new Error('Sessão expirada. Por favor, faça login novamente.');
         }
 
-        // Handle no content
         if (response.status === 204) {
             return {} as T;
         }
@@ -44,12 +47,17 @@ async function fetchWrapper<T>(endpoint: string, options: RequestOptions = {}): 
         const data = await response.json().catch(() => ({}));
 
         if (!response.ok) {
-            // Se o servidor enviou uma mensagem de erro na resposta
-            const errorMessage = data?.message || data?.error || `Erro inesperado (${response.status})`;
-            if (!skipGlobalErrorToast) {
-                toast.error(errorMessage);
+            let errorMessage = data?.message || data?.error;
+            if (!errorMessage) {
+                if (response.status === 403) errorMessage = 'Você não tem permissão para realizar esta ação.';
+                else if (response.status === 404) errorMessage = 'Recurso não encontrado.';
+                else if (response.status >= 500) errorMessage = 'Erro no servidor. Tente novamente.';
+                else errorMessage = `Erro inesperado (${response.status})`;
             }
-            throw new Error(errorMessage);
+            if (!skipGlobalErrorToast) {
+                toast.error(Array.isArray(errorMessage) ? errorMessage.join(', ') : String(errorMessage));
+            }
+            throw new Error(Array.isArray(errorMessage) ? errorMessage.join(', ') : String(errorMessage));
         }
 
         return data as T;
@@ -67,12 +75,15 @@ export const api = {
     get: <T>(endpoint: string, options?: RequestOptions) =>
         fetchWrapper<T>(endpoint, { method: 'GET', ...options }),
 
-    post: <T>(endpoint: string, body: any, options?: RequestOptions) =>
+    post: <T>(endpoint: string, body: unknown, options?: RequestOptions) =>
         fetchWrapper<T>(endpoint, { method: 'POST', body: JSON.stringify(body), ...options }),
 
-    patch: <T>(endpoint: string, body: any, options?: RequestOptions) =>
+    patch: <T>(endpoint: string, body: unknown, options?: RequestOptions) =>
         fetchWrapper<T>(endpoint, { method: 'PATCH', body: JSON.stringify(body), ...options }),
 
     delete: <T>(endpoint: string, options?: RequestOptions) =>
         fetchWrapper<T>(endpoint, { method: 'DELETE', ...options }),
+
+    upload: <T>(endpoint: string, formData: FormData, options?: RequestOptions) =>
+        fetchWrapper<T>(endpoint, { method: 'POST', body: formData, ...options }),
 };

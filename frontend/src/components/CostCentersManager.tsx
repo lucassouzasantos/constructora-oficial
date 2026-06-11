@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { Plus, Pencil, Trash2, Search, Target, Banknote } from 'lucide-react';
 import CurrencyInput from './CurrencyInput';
 import { formatCurrency } from '../utils/format';
+import { api } from '../utils/api';
 
 interface CostCenter {
     id: number;
@@ -30,8 +31,7 @@ export default function CostCentersManager({ onLaunchExpense }: CostCentersManag
     const fetchItems = async () => {
         setLoading(true);
         try {
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/cost-centers`);
-            const data = await response.json();
+            const data = await api.get<CostCenter[]>('/cost-centers');
             setItems(data);
         } catch (error) {
             console.error('Error fetching cost centers:', error);
@@ -42,17 +42,12 @@ export default function CostCentersManager({ onLaunchExpense }: CostCentersManag
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        const method = editingId ? 'PATCH' : 'POST';
-        const url = editingId
-            ? `${import.meta.env.VITE_API_URL}/cost-centers/${editingId}`
-            : `${import.meta.env.VITE_API_URL}/cost-centers`;
-
         try {
-            await fetch(url, {
-                method,
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(formData),
-            });
+            if (editingId) {
+                await api.patch(`/cost-centers/${editingId}`, formData);
+            } else {
+                await api.post('/cost-centers', formData);
+            }
             setIsModalOpen(false);
             setEditingId(null);
             setFormData({});
@@ -65,7 +60,7 @@ export default function CostCentersManager({ onLaunchExpense }: CostCentersManag
     const handleDelete = async (id: number) => {
         if (!confirm('Eliminar centro de custos?')) return;
         try {
-            await fetch(`${import.meta.env.VITE_API_URL}/cost-centers/${id}`, { method: 'DELETE' });
+            await api.delete(`/cost-centers/${id}`);
             fetchItems();
         } catch (error) {
             console.error('Error deleting:', error);

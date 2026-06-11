@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Plus, Search, Pencil, Trash, Package, AlertTriangle } from 'lucide-react';
 import CurrencyInput from './CurrencyInput';
 import { formatCurrency } from '../utils/format';
+import { api } from '../utils/api';
 
 interface Project {
     id: number;
@@ -52,8 +53,7 @@ export default function InventoryManager() {
 
     const fetchItems = async () => {
         try {
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/inventory?t=${new Date().getTime()}`);
-            const data = await response.json();
+            const data = await api.get<InventoryItem[]>(`/inventory?t=${new Date().getTime()}`);
             setItems(data);
         } catch (error) {
             console.error('Error fetching inventory:', error);
@@ -64,8 +64,7 @@ export default function InventoryManager() {
 
     const fetchProjects = async () => {
         try {
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/projects`);
-            const data = await response.json();
+            const data = await api.get<Project[]>('/projects');
             setProjects(data);
         } catch (error) {
             console.error('Error fetching projects:', error);
@@ -102,7 +101,7 @@ export default function InventoryManager() {
     const handleDelete = async (id: number) => {
         if (!window.confirm('Tem certeza que deseja excluir este item do estoque?')) return;
         try {
-            await fetch(`${import.meta.env.VITE_API_URL}/inventory/${id}`, { method: 'DELETE' });
+            await api.delete(`/inventory/${id}`);
             fetchItems();
         } catch (error) {
             console.error('Error deleting item:', error);
@@ -111,28 +110,22 @@ export default function InventoryManager() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        const url = editingItem ? `${import.meta.env.VITE_API_URL}/inventory/${editingItem.id}` : `${import.meta.env.VITE_API_URL}/inventory`;
-        const method = editingItem ? 'PATCH' : 'POST';
-
         const payload = {
             ...formData,
-            quantity: formData.quantity,
             minQuantity: formData.minQuantity ? formData.minQuantity : undefined,
             unitValue: formData.unitValue ? formData.unitValue : undefined,
             projectId: formData.projectId ? Number(formData.projectId) : undefined,
         };
-
         try {
-            await fetch(url, {
-                method,
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
+            if (editingItem) {
+                await api.patch(`/inventory/${editingItem.id}`, payload);
+            } else {
+                await api.post('/inventory', payload);
+            }
             setIsModalOpen(false);
             fetchItems();
         } catch (error) {
             console.error('Error saving item:', error);
-            alert('Erro ao salvar item.');
         }
     };
 

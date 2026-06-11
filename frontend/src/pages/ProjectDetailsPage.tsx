@@ -1,10 +1,11 @@
 import { formatCurrency } from '../utils/format';
 import { useState, useEffect } from 'react';
+import { api } from '../utils/api';
 
 import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft, Plus, Calendar, CheckCircle, Circle, Trash2, Battery, Edit, X } from 'lucide-react';
 import {
-    BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ComposedChart, Line
+    BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ComposedChart
 } from 'recharts';
 import CurrencyInput from '../components/CurrencyInput';
 
@@ -148,23 +149,18 @@ export default function ProjectDetailsPage() {
         const handleFinanceSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            const url = editingFinance 
-                ? `${import.meta.env.VITE_API_URL}/finance/${editingFinance.id}`
-                : `${import.meta.env.VITE_API_URL}/finance`;
-                
-            const method = editingFinance ? 'PATCH' : 'POST';
-
-            await fetch(url, {
-                method,
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    ...financeFormData,
-                    amount: Number(financeFormData.amount),
-                    quantity: financeFormData.quantity ? Number(financeFormData.quantity) : null,
-                    type: 'EXPENSE',
-                    projectId: Number(id)
-                }),
-            });
+            const payload = {
+                ...financeFormData,
+                amount: Number(financeFormData.amount),
+                quantity: financeFormData.quantity ? Number(financeFormData.quantity) : null,
+                type: 'EXPENSE',
+                projectId: Number(id)
+            };
+            if (editingFinance) {
+                await api.patch(`/finance/${editingFinance.id}`, payload);
+            } else {
+                await api.post('/finance', payload);
+            }
             setIsMaterialModalOpen(false);
             setIsServiceModalOpen(false);
             setEditingFinance(null);
@@ -204,6 +200,7 @@ export default function ProjectDetailsPage() {
     const [editingStage, setEditingStage] = useState<ProjectStage | null>(null);
     const [editingBudget, setEditingBudget] = useState<any | null>(null);
     const [editingFinance, setEditingFinance] = useState<any | null>(null);
+    const [deletingId, setDeletingId] = useState<number | null>(null);
 
     const [formData, setFormData] = useState({
         name: '',
@@ -219,26 +216,23 @@ export default function ProjectDetailsPage() {
     });
 
     useEffect(() => {
-        if (id) {
-            fetchProject();
-            fetchStages();
-            fetchBudgets();
-            fetchBudgets();
-            fetchExpenses();
-            fetchWorkLogs();
-            fetchWorkers();
-        }
+        if (!id) return;
+        setStages([]);
+        setBudgets([]);
+        setExpenses([]);
+        setWorkLogs([]);
+        fetchProject();
+        fetchStages();
+        fetchBudgets();
+        fetchExpenses();
+        fetchWorkLogs();
+        fetchWorkers();
     }, [id]);
 
     const fetchWorkers = async () => {
         try {
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/workers`);
-            const data = await response.json();
-            if (Array.isArray(data)) {
-                setWorkers(data.filter((w: any) => w.active));
-            } else {
-                setWorkers([]);
-            }
+            const data = await api.get<Worker[]>('/workers');
+            setWorkers(Array.isArray(data) ? data.filter((w: any) => w.active) : []);
         } catch (error) {
             console.error('Error fetching workers:', error);
             setWorkers([]);
@@ -247,13 +241,8 @@ export default function ProjectDetailsPage() {
 
     const fetchWorkLogs = async () => {
         try {
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/work-logs?projectId=${id}&t=${new Date().getTime()}`);
-            const data = await response.json();
-            if (Array.isArray(data)) {
-                setWorkLogs(data);
-            } else {
-                setWorkLogs([]);
-            }
+            const data = await api.get<WorkLog[]>(`/work-logs?projectId=${id}&t=${new Date().getTime()}`);
+            setWorkLogs(Array.isArray(data) ? data : []);
         } catch (error) {
             console.error('Error fetching work logs:', error);
             setWorkLogs([]);
@@ -263,16 +252,12 @@ export default function ProjectDetailsPage() {
     const handleWorkLogSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            await fetch(`${import.meta.env.VITE_API_URL}/work-logs`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    projectId: Number(id),
-                    workerId: Number(workLogFormData.workerId),
-                    date: new Date(workLogFormData.date).toISOString(),
-                    days: Number(workLogFormData.days),
-                    description: workLogFormData.description
-                })
+            await api.post('/work-logs', {
+                projectId: Number(id),
+                workerId: Number(workLogFormData.workerId),
+                date: new Date(workLogFormData.date).toISOString(),
+                days: Number(workLogFormData.days),
+                description: workLogFormData.description
             });
             setIsWorkLogModalOpen(false);
             setWorkLogFormData({
@@ -289,23 +274,21 @@ export default function ProjectDetailsPage() {
 
     const handleDeleteWorkLog = async (logId: number) => {
         if (!confirm('Excluir lançamento?')) return;
+        setDeletingId(logId);
         try {
-            await fetch(`${import.meta.env.VITE_API_URL}/work-logs/${logId}`, { method: 'DELETE' });
+            await api.delete(`/work-logs/${logId}`);
             fetchWorkLogs();
         } catch (error) {
             console.error('Error deleting work log:', error);
+        } finally {
+            setDeletingId(null);
         }
     };
 
     const fetchBudgets = async () => {
         try {
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/project-budgets?projectId=${id}&t=${new Date().getTime()}`);
-            const data = await response.json();
-            if (Array.isArray(data)) {
-                setBudgets(data);
-            } else {
-                setBudgets([]);
-            }
+            const data = await api.get<any[]>(`/project-budgets?projectId=${id}&t=${new Date().getTime()}`);
+            setBudgets(Array.isArray(data) ? data : []);
         } catch (error) {
             console.error('Error fetching budgets:', error);
         }
@@ -313,13 +296,8 @@ export default function ProjectDetailsPage() {
 
     const fetchExpenses = async () => {
         try {
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/finance?projectId=${id}&t=${new Date().getTime()}`);
-            const data = await response.json();
-            if (Array.isArray(data)) {
-                setExpenses(data);
-            } else {
-                setExpenses([]);
-            }
+            const data = await api.get<any[]>(`/finance?projectId=${id}&t=${new Date().getTime()}`);
+            setExpenses(Array.isArray(data) ? data : []);
         } catch (error) {
             console.error('Error fetching expenses:', error);
         }
@@ -343,20 +321,12 @@ export default function ProjectDetailsPage() {
     const handleBudgetSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            const url = editingBudget
-                ? `${import.meta.env.VITE_API_URL}/project-budgets/${editingBudget.id}`
-                : `${import.meta.env.VITE_API_URL}/project-budgets`;
-
-            const method = editingBudget ? 'PATCH' : 'POST';
-
-            await fetch(url, {
-                method,
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    ...budgetFormData,
-                    projectId: Number(id)
-                }),
-            });
+            const payload = { ...budgetFormData, projectId: Number(id) };
+            if (editingBudget) {
+                await api.patch(`/project-budgets/${editingBudget.id}`, payload);
+            } else {
+                await api.post('/project-budgets', payload);
+            }
             setIsBudgetModalOpen(false);
             setEditingBudget(null);
             fetchBudgets();
@@ -367,18 +337,20 @@ export default function ProjectDetailsPage() {
 
     const handleDeleteBudget = async (budgetId: number) => {
         if (!confirm('Excluir este orçamento previsto?')) return;
+        setDeletingId(budgetId);
         try {
-            await fetch(`${import.meta.env.VITE_API_URL}/project-budgets/${budgetId}`, { method: 'DELETE' });
+            await api.delete(`/project-budgets/${budgetId}`);
             fetchBudgets();
         } catch (error) {
             console.error('Error deleting budget:', error);
+        } finally {
+            setDeletingId(null);
         }
     };
 
     const fetchProject = async () => {
         try {
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/projects/${id}`);
-            const data = await response.json();
+            const data = await api.get<Project>(`/projects/${id}`);
             setProject(data);
         } catch (error) {
             console.error('Error fetching project:', error);
@@ -387,13 +359,8 @@ export default function ProjectDetailsPage() {
 
     const fetchStages = async () => {
         try {
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/project-stages?projectId=${id}`);
-            const data = await response.json();
-            if (Array.isArray(data)) {
-                setStages(data);
-            } else {
-                setStages([]);
-            }
+            const data = await api.get<ProjectStage[]>(`/project-stages?projectId=${id}&t=${new Date().getTime()}`);
+            setStages(Array.isArray(data) ? data : []);
         } catch (error) {
             console.error('Error fetching stages:', error);
         }
@@ -417,21 +384,17 @@ export default function ProjectDetailsPage() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (formData.startDatePlanned && formData.endDatePlanned && formData.startDatePlanned > formData.endDatePlanned) {
+            alert('A data de término não pode ser anterior à data de início.');
+            return;
+        }
         try {
-            const url = editingStage
-                ? `${import.meta.env.VITE_API_URL}/project-stages/${editingStage.id}`
-                : `${import.meta.env.VITE_API_URL}/project-stages`;
-
-            const method = editingStage ? 'PATCH' : 'POST';
-
-            await fetch(url, {
-                method,
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    ...formData,
-                    projectId: Number(id)
-                }),
-            });
+            const payload = { ...formData, projectId: Number(id) };
+            if (editingStage) {
+                await api.patch(`/project-stages/${editingStage.id}`, payload);
+            } else {
+                await api.post('/project-stages', payload);
+            }
             setIsModalOpen(false);
             setEditingStage(null);
             fetchStages();
@@ -442,21 +405,27 @@ export default function ProjectDetailsPage() {
 
     const handleDeleteStage = async (stageId: number) => {
         if (!confirm('Excluir etapa?')) return;
+        setDeletingId(stageId);
         try {
-            await fetch(`${import.meta.env.VITE_API_URL}/project-stages/${stageId}`, { method: 'DELETE' });
+            await api.delete(`/project-stages/${stageId}`);
             fetchStages();
         } catch (error) {
             console.error('Error deleting stage:', error);
+        } finally {
+            setDeletingId(null);
         }
     };
 
     const handleDeleteExpense = async (expenseId: number) => {
         if (!confirm('Excluir lançamento financeiro?')) return;
+        setDeletingId(expenseId);
         try {
-            await fetch(`${import.meta.env.VITE_API_URL}/finance/${expenseId}`, { method: 'DELETE' });
+            await api.delete(`/finance/${expenseId}`);
             fetchExpenses();
         } catch (error) {
             console.error('Error deleting expense:', error);
+        } finally {
+            setDeletingId(null);
         }
     };
 
@@ -473,18 +442,19 @@ export default function ProjectDetailsPage() {
     };
 
     const calculateFinancials = () => {
-        const totalExpenses = expenses.filter(e => e.type === 'EXPENSE').reduce((acc, curr) => acc + Number(curr.amount), 0);
-        const totalLabor = workLogs.reduce((acc, curr) => acc + (Number(curr.days) * Number(curr.worker.dailyRate)), 0);
+        const safe = (v: any) => { const n = Number(v); return isFinite(n) ? n : 0; };
+        const totalExpenses = expenses.filter(e => e.type === 'EXPENSE').reduce((acc, curr) => acc + safe(curr.amount), 0);
+        const totalLabor = workLogs.reduce((acc, curr) => acc + (safe(curr.days) * safe(curr.worker?.dailyRate)), 0);
         const totalCost = totalExpenses + totalLabor;
 
-        const totalBudget = budgets.reduce((acc, curr) => acc + Number(curr.amount), 0);
+        const totalBudget = budgets.reduce((acc, curr) => acc + safe(curr.amount), 0);
         const budgetDeviation = totalCost - totalBudget;
 
-        const salesValue = Number(project?.salesValue || 0);
+        const salesValue = safe(project?.salesValue);
         const margin = salesValue > 0 ? ((salesValue - totalCost) / salesValue) * 100 : 0;
         const profit = salesValue - totalCost;
 
-        const totalArea = Number(project?.totalArea || 0);
+        const totalArea = safe(project?.totalArea);
         const costPerM2 = totalArea > 0 ? totalCost / totalArea : 0;
         const predictedProfit = salesValue - totalBudget;
         const predictedMargin = salesValue > 0 ? (predictedProfit / salesValue) * 100 : 0;
@@ -497,14 +467,8 @@ export default function ProjectDetailsPage() {
     const handleFinishProject = async () => {
         if (!confirm('Tem certeza que deseja finalizar esta obra? Não será possível reverter essa ação.')) return;
         try {
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/projects/${id}`, {
-                method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ status: 'FINISHED' })
-            });
-            if (response.ok) {
-                fetchProject();
-            }
+            await api.patch(`/projects/${id}`, { status: 'FINISHED' });
+            fetchProject();
         } catch (error) {
             console.error('Error finishing project:', error);
         }
@@ -716,7 +680,7 @@ export default function ProjectDetailsPage() {
                                                 >
                                                     <Edit className="w-4 h-4" />
                                                 </button>
-                                                <button onClick={() => handleDeleteStage(stage.id)} className="text-slate-400 hover:text-red-500 transition-colors" title="Excluir Etapa">
+                                                <button onClick={() => handleDeleteStage(stage.id)} disabled={deletingId === stage.id} className="text-slate-400 hover:text-red-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed" title="Excluir Etapa">
                                                     <Trash2 className="w-4 h-4" />
                                                 </button>
                                             </div>
@@ -802,7 +766,8 @@ export default function ProjectDetailsPage() {
                                                 <button onClick={() => openMaterialModal(item)} className="text-slate-400 hover:text-blue-500 transition-colors" title="Editar Lançamento"><Edit className="w-4 h-4" /></button>
                                                 <button
                                                     onClick={() => handleDeleteExpense(item.id)}
-                                                    className="text-slate-400 hover:text-red-500 transition-colors"
+                                                    disabled={deletingId === item.id}
+                                                    className="text-slate-400 hover:text-red-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                                     title="Excluir Lançamento"
                                                 >
                                                     <Trash2 className="w-4 h-4" />
@@ -864,7 +829,8 @@ export default function ProjectDetailsPage() {
                                                 <button onClick={() => openServiceModal(item)} className="text-slate-400 hover:text-blue-500 transition-colors" title="Editar Lançamento"><Edit className="w-4 h-4" /></button>
                                                 <button
                                                     onClick={() => handleDeleteExpense(item.id)}
-                                                    className="text-slate-400 hover:text-red-500 transition-colors"
+                                                    disabled={deletingId === item.id}
+                                                    className="text-slate-400 hover:text-red-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                                     title="Excluir Lançamento"
                                                 >
                                                     <Trash2 className="w-4 h-4" />
@@ -951,7 +917,8 @@ export default function ProjectDetailsPage() {
                                             <td className="px-6 py-4 text-right">
                                                 <button
                                                     onClick={() => handleDeleteWorkLog(log.id)}
-                                                    className="text-slate-400 hover:text-red-500 transition-colors"
+                                                    disabled={deletingId === log.id}
+                                                    className="text-slate-400 hover:text-red-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                                 >
                                                     <Trash2 className="w-4 h-4" />
                                                 </button>
@@ -1011,7 +978,8 @@ export default function ProjectDetailsPage() {
                                                             </button>
                                                             <button
                                                                 onClick={() => handleDeleteBudget(item.id)}
-                                                                className="p-1 text-slate-400 hover:text-red-500 transition-colors"
+                                                                disabled={deletingId === item.id}
+                                                                className="p-1 text-slate-400 hover:text-red-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                                                 title="Excluir Orçamento"
                                                             >
                                                                 <Trash2 className="w-3 h-3" />

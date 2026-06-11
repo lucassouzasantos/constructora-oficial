@@ -21,14 +21,11 @@ export class ProjectStagesService {
     });
   }
 
-  findAll(projectId?: number) {
-    if (projectId) {
-      return this.prisma.projectStage.findMany({
-        where: { projectId: Number(projectId) },
-        orderBy: { startDatePlanned: 'asc' },
-      });
-    }
-    return this.prisma.projectStage.findMany();
+  findAll(projectId: number) {
+    return this.prisma.projectStage.findMany({
+      where: { projectId },
+      orderBy: { startDatePlanned: 'asc' },
+    });
   }
 
   findOne(id: number) {

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Plus, Search, FileText, Trash2, Edit, Copy, CheckCircle } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { formatCurrency } from '../utils/format';
+import { api } from '../utils/api';
 
 interface Quote {
     id: number;
@@ -27,20 +28,8 @@ export default function QuotesPage() {
 
     const fetchQuotes = async () => {
         try {
-            const token = localStorage.getItem('token');
-            const res = await fetch(`${import.meta.env.VITE_API_URL}/quotes`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-            if (res.status === 401) {
-                localStorage.removeItem('token');
-                localStorage.removeItem('user');
-                navigate('/login');
-                return;
-            }
-            if (res.ok) {
-                const data = await res.json();
-                setQuotes(data);
-            }
+            const data = await api.get<Quote[]>('/quotes');
+            setQuotes(data);
         } catch (error) {
             console.error('Error fetching quotes:', error);
         } finally {
@@ -51,11 +40,7 @@ export default function QuotesPage() {
     const handleDelete = async (id: number) => {
         if (!confirm('Tem certeza que deseja excluir este orçamento?')) return;
         try {
-            const token = localStorage.getItem('token');
-            await fetch(`${import.meta.env.VITE_API_URL}/quotes/${id}`, {
-                method: 'DELETE',
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
+            await api.delete(`/quotes/${id}`);
             fetchQuotes();
         } catch (error) {
             console.error('Error deleting:', error);
@@ -64,14 +49,8 @@ export default function QuotesPage() {
 
     const handleDuplicate = async (id: number) => {
         try {
-            const token = localStorage.getItem('token');
-            const res = await fetch(`${import.meta.env.VITE_API_URL}/quotes/${id}/duplicate`, {
-                method: 'POST',
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-            if (res.ok) {
-                fetchQuotes();
-            }
+            await api.post(`/quotes/${id}/duplicate`, {});
+            fetchQuotes();
         } catch (error) {
             console.error('Error duplicating:', error);
         }
@@ -80,22 +59,11 @@ export default function QuotesPage() {
     const handleConvertToProject = async (id: number) => {
         if (!confirm('Deseja converter este orçamento em uma nova Obra?')) return;
         try {
-            const token = localStorage.getItem('token');
-            const res = await fetch(`${import.meta.env.VITE_API_URL}/quotes/${id}/convert`, {
-                method: 'POST',
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-            if (res.ok) {
-                const newProject = await res.json();
-                navigate(`/projects/${newProject.id}`);
-            } else {
-                const errData = await res.json().catch(() => ({}));
-                console.error('Conversion failed:', errData);
-                alert(`Erro ao converter: ${errData.message || res.statusText}`);
-            }
-        } catch (error) {
+            const newProject = await api.post<{ id: number }>(`/quotes/${id}/convert`, {});
+            navigate(`/projects/${newProject.id}`);
+        } catch (error: any) {
             console.error('Error converting:', error);
-            alert('Erro de rede ao tentar converter o orçamento.');
+            alert(`Erro ao converter: ${error?.message || 'Erro desconhecido'}`);
         }
     };
 

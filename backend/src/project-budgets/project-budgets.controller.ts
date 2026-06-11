@@ -2,14 +2,15 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestj
 import { ProjectBudgetsService } from './project-budgets.service';
 import { CreateProjectBudgetDto } from './dto/create-project-budget.dto';
 import { UpdateProjectBudgetDto } from './dto/update-project-budget.dto';
+import { Roles } from '../auth/decorators/roles.decorator';
 
 @Controller('project-budgets')
 export class ProjectBudgetsController {
   constructor(private readonly projectBudgetsService: ProjectBudgetsService) { }
 
   @Post()
+  @Roles('ADMIN', 'MANAGER', 'USER')
   create(@Body() createProjectBudgetDto: CreateProjectBudgetDto) {
-    console.log('Controller received create request', createProjectBudgetDto);
     return this.projectBudgetsService.create(createProjectBudgetDto);
   }
 
@@ -24,11 +25,13 @@ export class ProjectBudgetsController {
   }
 
   @Patch(':id')
+  @Roles('ADMIN', 'MANAGER', 'USER')
   update(@Param('id') id: string, @Body() updateProjectBudgetDto: UpdateProjectBudgetDto) {
     return this.projectBudgetsService.update(+id, updateProjectBudgetDto);
   }
 
   @Delete(':id')
+  @Roles('ADMIN', 'MANAGER')
   remove(@Param('id') id: string) {
     return this.projectBudgetsService.remove(+id);
   }

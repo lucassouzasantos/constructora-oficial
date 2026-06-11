@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { X, Check } from 'lucide-react';
 import CurrencyInput from './CurrencyInput';
+import { api } from '../utils/api';
 
 interface TransactionModalProps {
     isOpen: boolean;
@@ -66,11 +67,8 @@ export default function TransactionModal({ isOpen, onClose, onSave, type, initia
     const fetchEntities = async () => {
         const endpoint = type === 'EXPENSE' ? 'suppliers' : 'customers';
         try {
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/${endpoint}`);
-            const data = await response.json();
-            if (Array.isArray(data)) {
-                setEntities(data);
-            }
+            const data = await api.get<any[]>(`/${endpoint}`);
+            if (Array.isArray(data)) setEntities(data);
         } catch (error) {
             console.error('Error fetching entities:', error);
         }
@@ -78,11 +76,8 @@ export default function TransactionModal({ isOpen, onClose, onSave, type, initia
 
     const fetchProjects = async () => {
         try {
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/projects`);
-            const data = await response.json();
-            if (Array.isArray(data)) {
-                setProjects(data);
-            }
+            const data = await api.get<any[]>('/projects');
+            if (Array.isArray(data)) setProjects(data);
         } catch (error) {
             console.error('Error fetching projects:', error);
         }
@@ -90,11 +85,8 @@ export default function TransactionModal({ isOpen, onClose, onSave, type, initia
 
     const fetchCostCenters = async () => {
         try {
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/cost-centers`);
-            const data = await response.json();
-            if (Array.isArray(data)) {
-                setCostCenters(data.filter((cc: any) => cc.active));
-            }
+            const data = await api.get<any[]>('/cost-centers');
+            if (Array.isArray(data)) setCostCenters(data.filter((cc: any) => cc.active));
         } catch (error) {
             console.error('Error fetching cost centers:', error);
         }

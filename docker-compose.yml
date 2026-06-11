@@ -8,8 +8,9 @@ services:
     ports:
       - "3000:3000"
     env_file:
-      # Puxa o arquivo .env de dentro da pasta backend com a senha do Supabase
       - ./backend/.env
+    volumes:
+      - uploads_data:/usr/src/app/uploads
     restart: unless-stopped
 
   frontend:
@@ -24,3 +25,6 @@ services:
     restart: unless-stopped
     depends_on:
       - backend
+
+volumes:
+  uploads_data:

@@ -1,6 +1,5 @@
 import { ExceptionFilter, Catch, ArgumentsHost, HttpException, HttpStatus } from '@nestjs/common';
 import { Request, Response } from 'express';
-import * as fs from 'fs';
 
 @Catch()
 export class GlobalExceptionFilter implements ExceptionFilter {
@@ -14,21 +13,16 @@ export class GlobalExceptionFilter implements ExceptionFilter {
                 ? exception.getStatus()
                 : HttpStatus.INTERNAL_SERVER_ERROR;
 
-        const message = exception instanceof HttpException ? exception.getResponse() : exception;
+        const clientMessage = exception instanceof HttpException
+            ? exception.getResponse()
+            : 'Erro interno do servidor. Tente novamente mais tarde.';
 
-        try {
-            const logMessage = `[${new Date().toISOString()}] ${request.method} ${request.url} - Status: ${status} - Error: ${JSON.stringify(message)}\nStack: ${exception instanceof Error ? exception.stack : 'No stack'}\n\n`;
-            fs.appendFileSync('server.log', logMessage);
-        } catch (e) {
-            console.error('Failed to log to file:', e);
-        }
-
-        console.error('Stocks API Error:', {
+        console.error('API Error:', {
             statusCode: status,
             timestamp: new Date().toISOString(),
             path: request.url,
             method: request.method,
-            error: message,
+            error: exception instanceof Error ? exception.message : exception,
             stack: exception instanceof Error ? exception.stack : null,
         });
 
@@ -36,7 +30,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
             statusCode: status,
             timestamp: new Date().toISOString(),
             path: request.url,
-            message: message,
+            message: clientMessage,
         });
     }
 }

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Plus, Search, User, Phone, CheckCircle, XCircle, Trash2, Edit } from 'lucide-react';
 import { formatCurrency } from '../utils/format';
 import CurrencyInput from '../components/CurrencyInput';
+import { api } from '../utils/api';
 
 interface Worker {
     id: number;
@@ -33,8 +34,7 @@ export default function TeamPage() {
 
     const fetchWorkers = async () => {
         try {
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/workers`);
-            const data = await response.json();
+            const data = await api.get<Worker[]>('/workers');
             setWorkers(data);
         } catch (error) {
             console.error('Error fetching workers:', error);
@@ -46,18 +46,11 @@ export default function TeamPage() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            const url = editingId
-                ? `${import.meta.env.VITE_API_URL}/workers/${editingId}`
-                : `${import.meta.env.VITE_API_URL}/workers`;
-
-            const method = editingId ? 'PATCH' : 'POST';
-
-            await fetch(url, {
-                method,
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(formData)
-            });
-
+            if (editingId) {
+                await api.patch(`/workers/${editingId}`, formData);
+            } else {
+                await api.post('/workers', formData);
+            }
             setIsModalOpen(false);
             setEditingId(null);
             resetForm();
@@ -70,7 +63,7 @@ export default function TeamPage() {
     const handleDelete = async (id: number) => {
         if (!confirm('Desativar colaborador?')) return;
         try {
-            await fetch(`${import.meta.env.VITE_API_URL}/workers/${id}`, { method: 'DELETE' });
+            await api.delete(`/workers/${id}`);
             fetchWorkers();
         } catch (error) {
             console.error('Error deleting worker:', error);

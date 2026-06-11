@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Plus, Search, FileText, Download, Building, Users, Calendar, Trash2 } from 'lucide-react';
+import { api } from '../utils/api';
 
 interface Project {
     id: number;
@@ -48,8 +49,7 @@ export default function ContractsPage() {
 
     const fetchContracts = async () => {
         try {
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/contracts`);
-            const data = await response.json();
+            const data = await api.get<Contract[]>('/contracts');
             setContracts(data);
         } catch (error) {
             console.error('Error fetching contracts:', error);
@@ -60,8 +60,7 @@ export default function ContractsPage() {
 
     const fetchProjects = async () => {
         try {
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/projects`);
-            const data = await response.json();
+            const data = await api.get<Project[]>('/projects');
             setProjects(data);
         } catch (error) {
             console.error('Error fetching projects:', error);
@@ -70,8 +69,7 @@ export default function ContractsPage() {
 
     const fetchCustomers = async () => {
         try {
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/customers`);
-            const data = await response.json();
+            const data = await api.get<Customer[]>('/customers');
             setCustomers(data);
         } catch (error) {
             console.error('Error fetching customers:', error);
@@ -105,36 +103,28 @@ export default function ContractsPage() {
         payload.append('file', selectedFile);
 
         try {
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/contracts`, {
-                method: 'POST',
-                body: payload,
-            });
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                console.error('Server error:', errorData);
-                alert(`Erro ao salvar contrato: ${JSON.stringify(errorData)}`);
-                return;
-            }
-
+            await api.upload('/contracts', payload);
             setIsModalOpen(false);
             fetchContracts();
         } catch (error) {
             console.error('Error saving contract:', error);
-            alert(`Erro ao salvar contrato: ${error instanceof Error ? error.message : 'Erro desconhecido'}`);
         }
     };
 
     const handleDelete = async (id: number) => {
         if (!confirm('Tem certeza que deseja excluir este contrato?')) return;
+        setDeletingId(id);
         try {
-            await fetch(`${import.meta.env.VITE_API_URL}/contracts/${id}`, { method: 'DELETE' });
+            await api.delete(`/contracts/${id}`);
             fetchContracts();
         } catch (error) {
             console.error('Error deleting contract:', error);
+        } finally {
+            setDeletingId(null);
         }
     };
 
+    const [deletingId, setDeletingId] = useState<number | null>(null);
     const [previewFile, setPreviewFile] = useState<{ url: string, type: string, title: string } | null>(null);
 
     return (
@@ -183,7 +173,8 @@ export default function ContractsPage() {
                                 <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                     <button
                                         onClick={() => handleDelete(contract.id)}
-                                        className="text-slate-400 hover:text-red-500 p-1.5 hover:bg-red-50 rounded-lg transition-colors"
+                                        disabled={deletingId === contract.id}
+                                        className="text-slate-400 hover:text-red-500 p-1.5 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                         title="Excluir Contrato"
                                     >
                                         <Trash2 className="w-4 h-4" />
@@ -379,6 +370,7 @@ export default function ContractsPage() {
                                     src={`${import.meta.env.VITE_API_URL}${previewFile.url}`}
                                     className="w-full h-full rounded-lg shadow-sm border border-slate-200 bg-white"
                                     title="PDF Preview"
+                                    sandbox="allow-same-origin allow-scripts allow-forms"
                                 />
                             ) : (
                                 <div className="text-center bg-white p-12 rounded-xl shadow-sm border border-slate-200">

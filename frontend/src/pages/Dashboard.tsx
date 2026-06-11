@@ -1,6 +1,7 @@
 import { TrendingUp, Users, Wallet, HardHat, CheckCircle } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { formatCurrency } from '../utils/format';
+import { api } from '../utils/api';
 
 export default function Dashboard() {
     const [stats, setStats] = useState({
@@ -15,20 +16,14 @@ export default function Dashboard() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                // 1. Fetch Projects
-                const projectsRes = await fetch(`${import.meta.env.VITE_API_URL}/projects`);
-                const projects = await projectsRes.json();
+                const [projects, workers, transactions] = await Promise.all([
+                    api.get<any[]>('/projects'),
+                    api.get<any[]>('/workers'),
+                    api.get<any[]>(`/finance?t=${new Date().getTime()}`),
+                ]);
                 const activeProjects = Array.isArray(projects) ? projects.filter((p: any) => p.status !== 'FINISHED').length : 0;
                 const finishedProjects = Array.isArray(projects) ? projects.filter((p: any) => p.status === 'FINISHED').length : 0;
-
-                // 2. Fetch Workers
-                const workersRes = await fetch(`${import.meta.env.VITE_API_URL}/workers`);
-                const workers = await workersRes.json();
                 const totalWorkers = Array.isArray(workers) ? workers.length : 0;
-
-                // 3. Fetch Finance for current month
-                const financeRes = await fetch(`${import.meta.env.VITE_API_URL}/finance?t=${new Date().getTime()}`);
-                const transactions = await financeRes.json();
 
                 let monthlyRevenue = 0;
                 let monthlyExpense = 0;

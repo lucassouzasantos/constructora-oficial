@@ -1,15 +1,15 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { QuotesService } from './quotes.service';
 import { CreateQuoteDto } from './dto/create-quote.dto';
 import { UpdateQuoteDto } from './dto/update-quote.dto';
-import { AuthGuard } from '@nestjs/passport';
+import { Roles } from '../auth/decorators/roles.decorator';
 
 @Controller('quotes')
-@UseGuards(AuthGuard('jwt'))
 export class QuotesController {
   constructor(private readonly quotesService: QuotesService) { }
 
   @Post()
+  @Roles('ADMIN', 'MANAGER', 'USER')
   create(@Body() createQuoteDto: CreateQuoteDto) {
     return this.quotesService.create(createQuoteDto);
   }
@@ -25,21 +25,25 @@ export class QuotesController {
   }
 
   @Patch(':id')
+  @Roles('ADMIN', 'MANAGER', 'USER')
   update(@Param('id') id: string, @Body() updateQuoteDto: UpdateQuoteDto) {
     return this.quotesService.update(+id, updateQuoteDto);
   }
 
   @Delete(':id')
+  @Roles('ADMIN', 'MANAGER')
   remove(@Param('id') id: string) {
     return this.quotesService.remove(+id);
   }
 
   @Post(':id/duplicate')
+  @Roles('ADMIN', 'MANAGER', 'USER')
   duplicate(@Param('id') id: string) {
     return this.quotesService.duplicate(+id);
   }
 
   @Post(':id/convert')
+  @Roles('ADMIN', 'MANAGER', 'USER')
   convertToProject(@Param('id') id: string) {
     return this.quotesService.convertToProject(+id);
   }
