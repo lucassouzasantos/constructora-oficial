@@ -7,12 +7,13 @@ import { UpdateQuoteDto } from './dto/update-quote.dto';
 export class QuotesService {
   constructor(private prisma: PrismaService) { }
 
-  async create(createQuoteDto: CreateQuoteDto) {
+  async create(createQuoteDto: CreateQuoteDto, tenantId: number) {
     const { stages, indirectCosts, ...quoteData } = createQuoteDto;
 
     return this.prisma.quote.create({
       data: {
         ...quoteData,
+        tenantId,
         stages: {
           create: stages?.map(stage => ({
             name: stage.name,
@@ -28,10 +29,7 @@ export class QuotesService {
           })) || []
         },
         indirectCosts: {
-          create: indirectCosts?.map(ic => ({
-            description: ic.description,
-            amount: ic.amount
-          })) || []
+          create: indirectCosts?.map(ic => ({ description: ic.description, amount: ic.amount })) || []
         }
       },
       include: {
@@ -42,8 +40,9 @@ export class QuotesService {
     });
   }
 
-  async findAll() {
+  async findAll(tenantId: number) {
     return this.prisma.quote.findMany({
+      where: { tenantId },
       include: {
         customer: true,
         stages: { include: { items: true } },
@@ -69,8 +68,6 @@ export class QuotesService {
   async update(id: number, updateQuoteDto: UpdateQuoteDto) {
     const { stages, indirectCosts, ...quoteData } = updateQuoteDto;
 
-    // To handle complex nested updates safely, we delete existing and recreate
-    // Only if stages or indirectCosts are provided in the payload
     if (stages !== undefined) {
       await this.prisma.quoteStage.deleteMany({ where: { quoteId: id } });
     }
@@ -100,10 +97,7 @@ export class QuotesService {
         }),
         ...(indirectCosts !== undefined && {
           indirectCosts: {
-            create: indirectCosts.map(ic => ({
-              description: ic.description,
-              amount: ic.amount
-            }))
+            create: indirectCosts.map(ic => ({ description: ic.description, amount: ic.amount }))
           }
         })
       },
@@ -119,7 +113,7 @@ export class QuotesService {
     return this.prisma.quote.delete({ where: { id } });
   }
 
-  async duplicate(id: number) {
+  async duplicate(id: number, tenantId: number) {
     const quote = await this.findOne(id);
     const newQuoteDto: CreateQuoteDto = {
       title: quote.title + ' (Cópia)',
@@ -151,13 +145,12 @@ export class QuotesService {
         amount: Number(ic.amount)
       }))
     };
-    return this.create(newQuoteDto);
+    return this.create(newQuoteDto, tenantId);
   }
 
-  async convertToProject(id: number) {
+  async convertToProject(id: number, tenantId: number) {
     const quote = await this.findOne(id);
 
-    // Calculate total quote value logic to put into salesValue
     let totalItems = 0;
     quote.stages.forEach(s => s.items.forEach(i => {
       totalItems += (Number(i.quantity) * Number(i.unitCost));
@@ -176,6 +169,7 @@ export class QuotesService {
         totalArea: quote.totalArea,
         salesValue: finalPrice,
         status: 'ACTIVE',
+        tenantId,
         stages: {
           create: quote.stages.map(s => ({
             name: s.name,
@@ -194,7 +188,6 @@ export class QuotesService {
       }
     });
 
-    // Update quote status
     await this.prisma.quote.update({ where: { id }, data: { status: 'APPROVED' } });
     return newProject;
   }

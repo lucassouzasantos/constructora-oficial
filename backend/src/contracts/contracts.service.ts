@@ -12,6 +12,7 @@ export class ContractsService {
     customerId?: number;
     fileUrl: string;
     fileType?: string;
+    tenantId: number;
   }) {
     return this.prisma.contract.create({
       data: {
@@ -19,21 +20,18 @@ export class ContractsService {
         description: data.description,
         fileUrl: data.fileUrl,
         fileType: data.fileType,
+        tenantId: data.tenantId,
         projectId: data.projectId ? Number(data.projectId) : undefined,
         customerId: data.customerId ? Number(data.customerId) : undefined,
       }
     });
   }
 
-  async findAll() {
+  async findAll(tenantId: number) {
     return this.prisma.contract.findMany({
-      include: {
-        project: true,
-        customer: true,
-      },
-      orderBy: {
-        createdAt: 'desc',
-      }
+      where: { tenantId },
+      include: { project: true, customer: true },
+      orderBy: { createdAt: 'desc' },
     });
   }
 
@@ -42,22 +40,15 @@ export class ContractsService {
       where: { id },
       include: { project: true, customer: true }
     });
-    if (!contract) {
-      throw new NotFoundException(`Contract with ID ${id} not found`);
-    }
+    if (!contract) throw new NotFoundException(`Contract with ID ${id} not found`);
     return contract;
   }
 
   async update(id: number, updateContractDto: any) {
-    return this.prisma.contract.update({
-      where: { id },
-      data: updateContractDto,
-    });
+    return this.prisma.contract.update({ where: { id }, data: updateContractDto });
   }
 
   async remove(id: number) {
-    return this.prisma.contract.delete({
-      where: { id },
-    });
+    return this.prisma.contract.delete({ where: { id } });
   }
 }

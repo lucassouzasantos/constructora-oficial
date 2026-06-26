@@ -10,6 +10,8 @@ Documentação técnica completa do sistema. Serve como contexto para IA e refer
 
 **Stack em uma linha:** NestJS 11 + Prisma + PostgreSQL no backend · React 19 + Vite + Tailwind CSS v4 no frontend · Docker + Nginx em produção.
 
+**Modelo de negócio:** SaaS multi-tenant. Cada empresa cadastrada tem seus dados isolados via `tenantId` embutido no JWT — sem subdomínio, sem prefixo de URL.
+
 ---
 
 ## 2. Stack Tecnológica
@@ -176,20 +178,30 @@ VITE_API_URL=http://localhost:3000  # Em desenvolvimento local
 
 ## 6. Autenticação e Autorização
 
+### Multi-tenancy
+O `tenantId` é extraído do JWT em cada requisição pela `JwtStrategy`. Todos os services de domínio filtram queries com `where: { tenantId }` e injetam o campo no `create()`. O isolamento é transparente — nenhum middleware extra, nenhum prefixo de URL.
+
+```
+Signup → cria Tenant + User(ADMIN) → JWT com { userId, tenantId, role }
+Login  → encontra User por email   → JWT com { userId, tenantId, role }
+Requests→ JwtStrategy extrai tenantId → services filtram por ele
+```
+
 ### Fluxo JWT
-1. `POST /auth/login` → **@Public()** (bypass do guard global), usa `LocalStrategy` com email + senha
-2. Resposta: `{ access_token: "eyJ...", user: { id, email, name, role } }`
-3. Frontend armazena `token` e `user` no `localStorage`
-4. Todas as requisições subsequentes incluem `Authorization: Bearer <token>`
-5. `JwtAuthGuard` (APP_GUARD global) valida o token em todos os endpoints
-6. `ProtectedRoute` no frontend verifica expiração do JWT via decode do payload (campo `exp`)
+1. `POST /auth/signup` → **@Public()**, cria Tenant + User ADMIN, retorna JWT + user
+2. `POST /auth/login` → **@Public()**, usa `LocalStrategy` com email + senha, retorna JWT + user
+3. Resposta: `{ access_token: "eyJ...", user: { id, email, name, role, tenantId, tenantName } }`
+4. Frontend armazena `token` e `user` no `localStorage`
+5. Todas as requisições subsequentes incluem `Authorization: Bearer <token>`
+6. `JwtAuthGuard` (APP_GUARD global) valida o token em todos os endpoints
+7. `ProtectedRoute` no frontend verifica expiração do JWT via decode do payload (campo `exp`)
 
 ### Ordem dos Guards Globais (APP_GUARD)
 ```
 ThrottlerGuard → JwtAuthGuard → RolesGuard
 ```
-- `ThrottlerGuard` — rate limiting (30 req/min global). Login: 5 req/min.
-- `JwtAuthGuard` — valida Bearer token. Popula `request.user` com `{ userId, email, role }`.
+- `ThrottlerGuard` — rate limiting (30 req/min global). Login/Signup: 5 req/min.
+- `JwtAuthGuard` — valida Bearer token. Popula `request.user` com `{ userId, email, role, tenantId }`.
 - `RolesGuard` — lê `@Roles()` do handler. Se nenhum decorator, permite qualquer autenticado.
 
 ### RBAC — Roles por Controller
@@ -231,6 +243,7 @@ ThrottlerGuard → JwtAuthGuard → RolesGuard
 ### Auth (`/auth`)
 | Método | Rota | Guard | Descrição |
 |---|---|---|---|
+| POST | `/auth/signup` | @Public | Cadastro: cria Tenant + User(ADMIN). Retorna JWT + user |
 | POST | `/auth/login` | @Public | Login com email+senha. Retorna JWT + user |
 | GET | `/auth/profile` | JWT | Perfil do usuário autenticado |
 
@@ -371,6 +384,17 @@ ThrottlerGuard → JwtAuthGuard → RolesGuard
 
 ## 8. Banco de Dados — Schema Prisma
 
+> **Multi-tenancy:** todos os modelos de domínio possuem `tenantId Int` + relação `tenant Tenant`. A `JwtStrategy` injeta o `tenantId` no `request.user` e cada service filtra por ele. Migration `20260618000000_add_multi_tenancy` criou o modelo `Tenant` e adicionou `tenantId` em todas as tabelas com backfill para o tenant padrão (id=1).
+
+### Tenant
+```prisma
+id        Int      @id @default(autoincrement())
+name      String   // Nome da empresa
+active    Boolean  @default(true)
+createdAt DateTime @default(now())
+// Relações: users + todos os 13 modelos de domínio
+```
+
 ### User
 ```prisma
 id        Int      @id @default(autoincrement())
@@ -378,6 +402,7 @@ email     String   @unique
 password  String   // bcrypt hash
 name      String?
 role      String   @default("USER")  // ADMIN | MANAGER | USER | VIEWER
+tenantId  Int      // FK → Tenant
 createdAt DateTime @default(now())
 updatedAt DateTime @updatedAt
 ```
@@ -586,6 +611,7 @@ process.env.PORT ?? 3000
 
 ```
 /login                  → LoginPage           (pública)
+/signup                 → SignupPage           (pública)
 /                       → ProtectedRoute
   /dashboard            → Dashboard           (padrão)
   /projects             → ProjectsPage
@@ -613,6 +639,17 @@ Tela de autenticação com design de construção (arte vetorial de prédios e g
 - Form: email + senha
 - POST `/auth/login` → salva `token` e `user` no localStorage
 - Redireciona para `/` no sucesso
+- Link "Criar conta gratuita" → `/signup`
+
+---
+
+### `SignupPage.tsx`
+Cadastro de nova empresa (cria Tenant + User ADMIN em uma operação).
+- Form: nome da empresa, nome do usuário, email, senha (mín. 6 chars)
+- POST `/auth/signup` → salva `token` e `user` no localStorage
+- Redireciona para `/` no sucesso
+- Link "Já tem conta? Entrar" → `/login`
+- Design idêntico ao `LoginPage` (arte vetorial de construção + header laranja)
 
 ---
 
@@ -778,10 +815,14 @@ Editor de orçamentos com 3 abas + sidebar de cálculo.
 - Campo de margem editável inline
 - Custo por m² (se área informada)
 
-**Geração de PDF:**
-- Captura de HTML oculto com `html-to-image` → `jsPDF`
-- Documento de 2 partes: capa e conteúdo (serviços + condições + assinaturas)
-- A capa tem design gráfico com ondas SVG em laranja
+**Geração de PDF (3 refs independentes):**
+- Toggle de idioma **PT 🇧🇷 / ES 🇵🇾** na sidebar — strings via objeto `translations`
+- `coverRef` → Página 1: capa (design SVG com ondas laranjas + faixa slate escura)
+- `contentHeaderRef` → cabeçalho fixo (logo, dados do cliente, barra de colunas em flexbox)
+- `stageRefs[]` → um `<div>` por etapa, capturado individualmente com `toCanvas()`
+- Quebra de página inteligente: antes de posicionar cada etapa, verifica `currentY + hMM > pageHeight` — se não couber, `pdf.addPage()` automático
+- `summaryRef` → Última página A4 fixa (1130px): valor total do projeto, prazos/condições, inclusões/exclusões, assinaturas, faixa decorativa SVG no rodapé
+- Empresa nas assinaturas: **Construtora Buen Futuro**
 
 ---
 
@@ -810,6 +851,7 @@ Relatórios financeiros com filtros temporais.
 ### `Layout.tsx`
 Estrutura principal da aplicação.
 - **Sidebar** (slate-900, 256px): logo, navegação, botão logout, info do usuário
+- **Rodapé da sidebar:** exibe `user.name` (usuário) + `user.tenantName` (nome da empresa)
 - **Header** (branco): título da página atual, ícone do usuário
 - **Hamburger menu** (mobile): overlay com backdrop-blur-sm
 - Navegação condicional: item "Admin" visível apenas para `role === 'ADMIN'`

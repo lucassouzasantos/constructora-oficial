@@ -1,4 +1,4 @@
-import { Injectable, ConflictException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { PrismaService } from '../prisma.service';
@@ -7,7 +7,7 @@ import { PrismaService } from '../prisma.service';
 export class ProjectsService {
   constructor(private prisma: PrismaService) { }
 
-  create(createProjectDto: CreateProjectDto) {
+  create(createProjectDto: CreateProjectDto, tenantId: number) {
     return this.prisma.project.create({
       data: {
         name: createProjectDto.name,
@@ -19,12 +19,14 @@ export class ProjectsService {
         customerId: createProjectDto.customerId ? Number(createProjectDto.customerId) : null,
         totalArea: createProjectDto.totalArea ? Number(createProjectDto.totalArea) : null,
         salesValue: createProjectDto.salesValue ? Number(createProjectDto.salesValue) : null,
+        tenantId,
       },
     });
   }
 
-  findAll() {
+  findAll(tenantId: number) {
     return this.prisma.project.findMany({
+      where: { tenantId },
       include: { customer: true },
       orderBy: { createdAt: 'desc' },
     });

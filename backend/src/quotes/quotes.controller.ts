@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Request } from '@nestjs/common';
 import { QuotesService } from './quotes.service';
 import { CreateQuoteDto } from './dto/create-quote.dto';
 import { UpdateQuoteDto } from './dto/update-quote.dto';
@@ -10,13 +10,13 @@ export class QuotesController {
 
   @Post()
   @Roles('ADMIN', 'MANAGER', 'USER')
-  create(@Body() createQuoteDto: CreateQuoteDto) {
-    return this.quotesService.create(createQuoteDto);
+  create(@Request() req, @Body() createQuoteDto: CreateQuoteDto) {
+    return this.quotesService.create(createQuoteDto, req.user.tenantId);
   }
 
   @Get()
-  findAll() {
-    return this.quotesService.findAll();
+  findAll(@Request() req) {
+    return this.quotesService.findAll(req.user.tenantId);
   }
 
   @Get(':id')
@@ -38,13 +38,13 @@ export class QuotesController {
 
   @Post(':id/duplicate')
   @Roles('ADMIN', 'MANAGER', 'USER')
-  duplicate(@Param('id') id: string) {
-    return this.quotesService.duplicate(+id);
+  duplicate(@Request() req, @Param('id') id: string) {
+    return this.quotesService.duplicate(+id, req.user.tenantId);
   }
 
   @Post(':id/convert')
   @Roles('ADMIN', 'MANAGER', 'USER')
-  convertToProject(@Param('id') id: string) {
-    return this.quotesService.convertToProject(+id);
+  convertToProject(@Request() req, @Param('id') id: string) {
+    return this.quotesService.convertToProject(+id, req.user.tenantId);
   }
 }

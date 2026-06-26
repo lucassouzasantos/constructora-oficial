@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Request } from '@nestjs/common';
 import { CostCentersService } from './cost-centers.service';
 import { CreateCostCenterDto } from './dto/create-cost-center.dto';
 import { UpdateCostCenterDto } from './dto/update-cost-center.dto';
@@ -10,13 +10,13 @@ export class CostCentersController {
 
   @Post()
   @Roles('ADMIN', 'MANAGER', 'USER')
-  create(@Body() createCostCenterDto: CreateCostCenterDto) {
-    return this.costCentersService.create(createCostCenterDto);
+  create(@Request() req, @Body() createCostCenterDto: CreateCostCenterDto) {
+    return this.costCentersService.create(createCostCenterDto, req.user.tenantId);
   }
 
   @Get()
-  findAll() {
-    return this.costCentersService.findAll();
+  findAll(@Request() req) {
+    return this.costCentersService.findAll(req.user.tenantId);
   }
 
   @Get(':id')

@@ -1,4 +1,5 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, UploadedFile, BadRequestException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, UploadedFile, BadRequestException, Request } from '@nestjs/common';
+import { mkdirSync } from 'fs';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
@@ -24,7 +25,12 @@ export class ContractsController {
   @Roles('ADMIN', 'MANAGER', 'USER')
   @UseInterceptors(FileInterceptor('file', {
     storage: diskStorage({
-      destination: './uploads',
+      destination: (req: any, file, callback) => {
+        const tenantId = req.user?.tenantId || 'default';
+        const dir = `./uploads/${tenantId}`;
+        mkdirSync(dir, { recursive: true });
+        callback(null, dir);
+      },
       filename: (req, file, callback) => {
         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
         const ext = extname(file.originalname);
@@ -41,6 +47,7 @@ export class ContractsController {
     }
   }))
   create(
+    @Request() req,
     @Body() createContractDto: CreateContractDto,
     @UploadedFile() file: Express.Multer.File,
   ) {
@@ -49,14 +56,15 @@ export class ContractsController {
     }
     return this.contractsService.create({
       ...createContractDto,
-      fileUrl: `/uploads/${file.filename}`,
+      fileUrl: `/uploads/${req.user.tenantId}/${file.filename}`,
       fileType: file.mimetype,
+      tenantId: req.user.tenantId,
     });
   }
 
   @Get()
-  findAll() {
-    return this.contractsService.findAll();
+  findAll(@Request() req) {
+    return this.contractsService.findAll(req.user.tenantId);
   }
 
   @Get(':id')

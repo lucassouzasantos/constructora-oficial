@@ -1,16 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
-import { CreateWorkLogDto, UpdateWorkLogDto } from './dto/work-log.dto';
+import { CreateWorkLogDto } from './dto/work-log.dto';
 
 @Injectable()
 export class WorkLogsService {
     constructor(private prisma: PrismaService) { }
 
-    create(data: CreateWorkLogDto) {
+    create(data: CreateWorkLogDto, tenantId: number) {
         return this.prisma.workLog.create({
             data: {
                 worker: { connect: { id: Number(data.workerId) } },
                 project: { connect: { id: Number(data.projectId) } },
+                tenant: { connect: { id: tenantId } },
                 date: new Date(data.date),
                 days: Number(data.days),
                 description: data.description,
@@ -32,15 +33,10 @@ export class WorkLogsService {
             where: { projectId },
             include: { worker: true },
         });
-
-        return logs.reduce((total, log) => {
-            return total + (Number(log.days) * Number(log.worker.dailyRate));
-        }, 0);
+        return logs.reduce((total, log) => total + (Number(log.days) * Number(log.worker.dailyRate)), 0);
     }
 
     remove(id: number) {
-        return this.prisma.workLog.delete({
-            where: { id },
-        });
+        return this.prisma.workLog.delete({ where: { id } });
     }
 }

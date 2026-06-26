@@ -8,6 +8,24 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
+model Tenant {
+  id           Int                    @id @default(autoincrement())
+  name         String
+  active       Boolean                @default(true)
+  createdAt    DateTime               @default(now())
+  users        User[]
+  projects     Project[]
+  transactions FinancialTransaction[]
+  suppliers    Supplier[]
+  customers    Customer[]
+  workers      Worker[]
+  workLogs     WorkLog[]
+  costCenters  CostCenter[]
+  inventory    InventoryItem[]
+  contracts    Contract[]
+  quotes       Quote[]
+}
+
 model User {
   id        Int      @id @default(autoincrement())
   email     String   @unique
@@ -16,6 +34,11 @@ model User {
   role      String   @default("USER") // ADMIN, MANAGER, VIEWER
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  tenantId  Int
+  tenant    Tenant   @relation(fields: [tenantId], references: [id])
+
+  @@index([tenantId])
 }
 
 model FinancialTransaction {
@@ -40,12 +63,16 @@ model FinancialTransaction {
   costCenterId Int?
   costCenter   CostCenter? @relation(fields: [costCenterId], references: [id])
 
+  tenantId     Int
+  tenant       Tenant      @relation(fields: [tenantId], references: [id])
+
   @@index([projectId])
   @@index([supplierId])
   @@index([customerId])
   @@index([costCenterId])
   @@index([type])
   @@index([status])
+  @@index([tenantId])
 }
 
 model Supplier {
@@ -58,6 +85,11 @@ model Supplier {
   transactions FinancialTransaction[]
   createdAt    DateTime               @default(now())
   updatedAt    DateTime               @updatedAt
+
+  tenantId     Int
+  tenant       Tenant                 @relation(fields: [tenantId], references: [id])
+
+  @@index([tenantId])
 }
 
 model Project {
@@ -81,8 +113,12 @@ model Project {
   InventoryItem InventoryItem[]
   contracts     Contract[]
 
+  tenantId      Int
+  tenant        Tenant                 @relation(fields: [tenantId], references: [id])
+
   @@index([customerId])
   @@index([status])
+  @@index([tenantId])
 }
 
 model ProjectStage {
@@ -127,6 +163,11 @@ model Customer {
   quotes       Quote[]
   createdAt    DateTime               @default(now())
   updatedAt    DateTime               @updatedAt
+
+  tenantId     Int
+  tenant       Tenant                 @relation(fields: [tenantId], references: [id])
+
+  @@index([tenantId])
 }
 
 model Worker {
@@ -139,6 +180,11 @@ model Worker {
   workLogs   WorkLog[]
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
+
+  tenantId   Int
+  tenant     Tenant    @relation(fields: [tenantId], references: [id])
+
+  @@index([tenantId])
 }
 
 model WorkLog {
@@ -153,11 +199,15 @@ model WorkLog {
   projectId Int
   project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
+  tenantId  Int
+  tenant    Tenant  @relation(fields: [tenantId], references: [id])
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([projectId])
   @@index([workerId])
+  @@index([tenantId])
 }
 
 model CostCenter {
@@ -169,6 +219,11 @@ model CostCenter {
   transactions FinancialTransaction[]
   createdAt    DateTime               @default(now())
   updatedAt    DateTime               @updatedAt
+
+  tenantId     Int
+  tenant       Tenant                 @relation(fields: [tenantId], references: [id])
+
+  @@index([tenantId])
 }
 
 model InventoryItem {
@@ -183,10 +238,14 @@ model InventoryItem {
   projectId Int?
   project   Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
 
+  tenantId  Int
+  tenant    Tenant   @relation(fields: [tenantId], references: [id])
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([projectId])
+  @@index([tenantId])
 }
 
 model Contract {
@@ -197,30 +256,33 @@ model Contract {
   fileType    String?  // Ex: application/pdf, image/jpeg
   createdAt   DateTime @default(now())
 
-  // Relações
   projectId   Int?
   project     Project?  @relation(fields: [projectId], references: [id], onDelete: SetNull)
 
   customerId  Int?
   customer    Customer? @relation(fields: [customerId], references: [id], onDelete: SetNull)
 
+  tenantId    Int
+  tenant      Tenant    @relation(fields: [tenantId], references: [id])
+
   @@index([projectId])
   @@index([customerId])
+  @@index([tenantId])
 }
 
 model Quote {
   id          Int      @id @default(autoincrement())
-  title       String   
+  title       String
   customerId  Int?
   customer    Customer? @relation(fields: [customerId], references: [id], onDelete: SetNull)
   address     String?
   city        String?
-  type        String   
+  type        String
   totalArea   Decimal?  @db.Decimal(10, 2)
   date        DateTime @default(now())
   responsible String?
   status      String @default("DRAFT") // DRAFT, SENT, APPROVED, REJECTED
-  
+
   paymentTerms     String?
   estimatedTime    String?
   includedItems    String?
@@ -228,22 +290,26 @@ model Quote {
   validityDays     Int? @default(15)
 
   marginPercentage Decimal? @db.Decimal(5, 2)
-  
+
   stages        QuoteStage[]
   indirectCosts QuoteIndirectCost[]
+
+  tenantId  Int
+  tenant    Tenant   @relation(fields: [tenantId], references: [id])
 
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
   @@index([customerId])
   @@index([status])
+  @@index([tenantId])
 }
 
 model QuoteStage {
   id          Int      @id @default(autoincrement())
-  name        String   
-  description String?  
-  
+  name        String
+  description String?
+
   quoteId     Int
   quote       Quote    @relation(fields: [quoteId], references: [id], onDelete: Cascade)
   items       QuoteItem[]
@@ -252,19 +318,19 @@ model QuoteStage {
 model QuoteItem {
   id          Int      @id @default(autoincrement())
   description String
-  unit        String   
+  unit        String
   quantity    Decimal  @db.Decimal(10, 2)
-  unitCost  Decimal @db.Decimal(15, 2)
-  
+  unitCost    Decimal @db.Decimal(15, 2)
+
   stageId     Int
   stage       QuoteStage @relation(fields: [stageId], references: [id], onDelete: Cascade)
 }
 
 model QuoteIndirectCost {
   id          Int      @id @default(autoincrement())
-  description String   
+  description String
   amount      Decimal @db.Decimal(15, 2)
-  
+
   quoteId     Int
   quote       Quote    @relation(fields: [quoteId], references: [id], onDelete: Cascade)
 }

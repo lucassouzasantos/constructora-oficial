@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Request } from '@nestjs/common';
 import { InventoryService } from './inventory.service';
 import { CreateInventoryDto } from './dto/create-inventory.dto';
 import { UpdateInventoryDto } from './dto/update-inventory.dto';
@@ -10,13 +10,13 @@ export class InventoryController {
 
   @Post()
   @Roles('ADMIN', 'MANAGER', 'USER')
-  create(@Body() createInventoryDto: CreateInventoryDto) {
-    return this.inventoryService.create(createInventoryDto);
+  create(@Request() req, @Body() createInventoryDto: CreateInventoryDto) {
+    return this.inventoryService.create(createInventoryDto, req.user.tenantId);
   }
 
   @Get()
-  findAll() {
-    return this.inventoryService.findAll();
+  findAll(@Request() req) {
+    return this.inventoryService.findAll(req.user.tenantId);
   }
 
   @Get(':id')

@@ -15,6 +15,7 @@ import QuotesPage from './pages/QuotesPage';
 import QuoteEditorPage from './pages/QuoteEditorPage';
 import AdminPage from './pages/AdminPage';
 import LoginPage from './pages/LoginPage';
+import SignupPage from './pages/SignupPage';
 import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
@@ -23,6 +24,7 @@ function App() {
       <Toaster position="top-right" richColors />
       <Routes>
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<SignupPage />} />
 
         <Route element={<ProtectedRoute />}>
           <Route element={<Layout />}>

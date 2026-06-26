@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, Delete, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, Query, Request } from '@nestjs/common';
 import { WorkLogsService } from './work-logs.service';
 import { CreateWorkLogDto } from './dto/work-log.dto';
 import { Roles } from '../auth/decorators/roles.decorator';
@@ -9,8 +9,8 @@ export class WorkLogsController {
 
     @Post()
     @Roles('ADMIN', 'MANAGER', 'USER')
-    create(@Body() createWorkLogDto: CreateWorkLogDto) {
-        return this.workLogsService.create(createWorkLogDto);
+    create(@Request() req, @Body() createWorkLogDto: CreateWorkLogDto) {
+        return this.workLogsService.create(createWorkLogDto, req.user.tenantId);
     }
 
     @Get()

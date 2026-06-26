@@ -23,13 +23,18 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
         });
 
         if (!existingAdmin) {
+            let tenant = await this.tenant.findFirst();
+            if (!tenant) {
+                tenant = await this.tenant.create({ data: { name: 'Empresa Padrão' } });
+            }
             const hashedPassword = await bcrypt.hash(adminPassword, 10);
             await this.user.create({
                 data: {
                     email: adminEmail,
                     password: hashedPassword,
                     name: 'Administrador',
-                    role: 'ADMIN'
+                    role: 'ADMIN',
+                    tenantId: tenant.id
                 }
             });
             console.log(`Usuário ADMIN criado: ${adminEmail}`);

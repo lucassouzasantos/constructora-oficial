@@ -6,42 +6,31 @@ import { CreateWorkerDto, UpdateWorkerDto } from './dto/worker.dto';
 export class WorkersService {
     constructor(private prisma: PrismaService) { }
 
-    create(data: CreateWorkerDto) {
+    create(data: CreateWorkerDto, tenantId: number) {
         return this.prisma.worker.create({
-            data: {
-                ...data,
-                dailyRate: Number(data.dailyRate),
-            },
+            data: { ...data, dailyRate: Number(data.dailyRate), tenantId },
         });
     }
 
-    findAll() {
+    findAll(tenantId: number) {
         return this.prisma.worker.findMany({
-            where: { active: true },
+            where: { active: true, tenantId },
             orderBy: { name: 'asc' },
         });
     }
 
     findOne(id: number) {
-        return this.prisma.worker.findUnique({
-            where: { id },
-        });
+        return this.prisma.worker.findUnique({ where: { id } });
     }
 
     update(id: number, data: UpdateWorkerDto) {
         return this.prisma.worker.update({
             where: { id },
-            data: {
-                ...data,
-                dailyRate: data.dailyRate ? Number(data.dailyRate) : undefined,
-            },
+            data: { ...data, dailyRate: data.dailyRate ? Number(data.dailyRate) : undefined },
         });
     }
 
     remove(id: number) {
-        return this.prisma.worker.update({
-            where: { id },
-            data: { active: false },
-        });
+        return this.prisma.worker.update({ where: { id }, data: { active: false } });
     }
 }

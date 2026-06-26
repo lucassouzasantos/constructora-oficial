@@ -7,7 +7,7 @@ import { PrismaService } from '../prisma.service';
 export class FinanceService {
   constructor(private prisma: PrismaService) { }
 
-  create(createFinanceDto: CreateFinanceDto) {
+  create(createFinanceDto: CreateFinanceDto, tenantId: number) {
     const { dueDate, supplierId, customerId, projectId, costCenterId, category, quantity, unit, ...rest } = createFinanceDto;
     return this.prisma.financialTransaction.create({
       data: {
@@ -16,10 +16,11 @@ export class FinanceService {
         quantity,
         unit,
         dueDate: new Date(dueDate),
-        ...(supplierId && { supplier: { connect: { id: Number(supplierId) } } }),
-        ...(customerId && { customer: { connect: { id: Number(customerId) } } }),
-        ...(projectId && { project: { connect: { id: Number(projectId) } } }),
-        ...(costCenterId && { costCenter: { connect: { id: Number(costCenterId) } } }),
+        tenantId,
+        supplierId: supplierId ? Number(supplierId) : undefined,
+        customerId: customerId ? Number(customerId) : undefined,
+        projectId: projectId ? Number(projectId) : undefined,
+        costCenterId: costCenterId ? Number(costCenterId) : undefined,
       },
       include: {
         supplier: true,
@@ -29,9 +30,9 @@ export class FinanceService {
     });
   }
 
-  findAll(projectId?: number) {
+  findAll(tenantId: number, projectId?: number) {
     return this.prisma.financialTransaction.findMany({
-      where: projectId ? { projectId } : undefined,
+      where: { tenantId, ...(projectId ? { projectId } : {}) },
       orderBy: { dueDate: 'desc' },
       include: {
         supplier: true,
@@ -55,44 +56,21 @@ export class FinanceService {
   update(id: number, updateFinanceDto: UpdateFinanceDto) {
     const { dueDate, supplierId, customerId, projectId, category, quantity, unit, ...rest } = updateFinanceDto;
 
-    const data: any = {
-      ...rest,
-      category,
-      quantity,
-      unit,
-    };
+    const data: any = { ...rest, category, quantity, unit };
 
-    if (dueDate) {
-      data.dueDate = new Date(dueDate);
-    }
-
-    // Handle Relations via Scalar Fields
-    if (supplierId !== undefined) {
-      data.supplierId = supplierId ? Number(supplierId) : null;
-    }
-
-    if (customerId !== undefined) {
-      data.customerId = customerId ? Number(customerId) : null;
-    }
-
-    if (projectId !== undefined) {
-      data.projectId = projectId ? Number(projectId) : null;
-    }
+    if (dueDate) data.dueDate = new Date(dueDate);
+    if (supplierId !== undefined) data.supplierId = supplierId ? Number(supplierId) : null;
+    if (customerId !== undefined) data.customerId = customerId ? Number(customerId) : null;
+    if (projectId !== undefined) data.projectId = projectId ? Number(projectId) : null;
 
     return this.prisma.financialTransaction.update({
       where: { id },
       data,
-      include: {
-        supplier: true,
-        customer: true,
-        project: true,
-      },
+      include: { supplier: true, customer: true, project: true },
     });
   }
 
   remove(id: number) {
-    return this.prisma.financialTransaction.delete({
-      where: { id },
-    });
+    return this.prisma.financialTransaction.delete({ where: { id } });
   }
 }

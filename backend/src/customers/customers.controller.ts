@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Request } from '@nestjs/common';
 import { CustomersService } from './customers.service';
 import { CreateCustomerDto } from './dto/create-customer.dto';
 import { UpdateCustomerDto } from './dto/update-customer.dto';
@@ -10,13 +10,13 @@ export class CustomersController {
 
   @Post()
   @Roles('ADMIN', 'MANAGER', 'USER')
-  create(@Body() createCustomerDto: CreateCustomerDto) {
-    return this.customersService.create(createCustomerDto);
+  create(@Request() req, @Body() createCustomerDto: CreateCustomerDto) {
+    return this.customersService.create(createCustomerDto, req.user.tenantId);
   }
 
   @Get()
-  findAll() {
-    return this.customersService.findAll();
+  findAll(@Request() req) {
+    return this.customersService.findAll(req.user.tenantId);
   }
 
   @Get(':id')

@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, Request } from '@nestjs/common';
 import { FinanceService } from './finance.service';
 import { CreateFinanceDto } from './dto/create-finance.dto';
 import { UpdateFinanceDto } from './dto/update-finance.dto';
@@ -10,13 +10,13 @@ export class FinanceController {
 
   @Post()
   @Roles('ADMIN', 'MANAGER', 'USER')
-  create(@Body() createFinanceDto: CreateFinanceDto) {
-    return this.financeService.create(createFinanceDto);
+  create(@Request() req, @Body() createFinanceDto: CreateFinanceDto) {
+    return this.financeService.create(createFinanceDto, req.user.tenantId);
   }
 
   @Get()
-  findAll(@Query('projectId') projectId?: string) {
-    return this.financeService.findAll(projectId ? +projectId : undefined);
+  findAll(@Request() req, @Query('projectId') projectId?: string) {
+    return this.financeService.findAll(req.user.tenantId, projectId ? +projectId : undefined);
   }
 
   @Get(':id')

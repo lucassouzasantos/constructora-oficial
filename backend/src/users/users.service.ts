@@ -8,28 +8,29 @@ import * as bcrypt from 'bcrypt';
 export class UsersService {
     constructor(private prisma: PrismaService) { }
 
-    async findAll() {
+    async findAll(tenantId: number) {
         return this.prisma.user.findMany({
+            where: { tenantId },
             select: { id: true, name: true, email: true, role: true, createdAt: true }
         });
     }
 
     async findOne(email: string) {
-        return this.prisma.user.findUnique({
-            where: { email },
-        });
+        return this.prisma.user.findUnique({ where: { email } });
     }
 
-    async create(data: CreateUserDto) {
+    async create(data: CreateUserDto, tenantId: number) {
         const existing = await this.prisma.user.findUnique({ where: { email: data.email } });
         if (existing) throw new ConflictException('Email already in use');
 
-        const hashedPassword = await bcrypt.hash(data.password, 10);
+        const hashedPassword = await bcrypt.hash(data.password!, 10);
         const user = await this.prisma.user.create({
             data: {
-                ...data,
+                email: data.email,
+                name: data.name,
                 password: hashedPassword,
-                role: data.role || 'USER'
+                role: data.role || 'USER',
+                tenantId,
             }
         });
         const { password, ...result } = user;
@@ -41,10 +42,7 @@ export class UsersService {
         if (data.password) {
             updateData.password = await bcrypt.hash(data.password, 10);
         }
-        const user = await this.prisma.user.update({
-            where: { id },
-            data: updateData
-        });
+        const user = await this.prisma.user.update({ where: { id }, data: updateData });
         const { password, ...result } = user;
         return result;
     }

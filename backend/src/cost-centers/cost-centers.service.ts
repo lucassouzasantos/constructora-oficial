@@ -7,34 +7,28 @@ import { UpdateCostCenterDto } from './dto/update-cost-center.dto';
 export class CostCentersService {
   constructor(private prisma: PrismaService) { }
 
-  create(createCostCenterDto: CreateCostCenterDto) {
+  create(createCostCenterDto: CreateCostCenterDto, tenantId: number) {
     return this.prisma.costCenter.create({
-      data: createCostCenterDto,
+      data: { ...createCostCenterDto, tenantId },
     });
   }
 
-  findAll() {
+  findAll(tenantId: number) {
     return this.prisma.costCenter.findMany({
+      where: { tenantId },
       orderBy: { name: 'asc' },
     });
   }
 
   findOne(id: number) {
-    return this.prisma.costCenter.findUnique({
-      where: { id },
-    });
+    return this.prisma.costCenter.findUnique({ where: { id } });
   }
 
   update(id: number, updateCostCenterDto: UpdateCostCenterDto) {
-    return this.prisma.costCenter.update({
-      where: { id },
-      data: updateCostCenterDto,
-    });
+    return this.prisma.costCenter.update({ where: { id }, data: updateCostCenterDto });
   }
 
   remove(id: number) {
-    return this.prisma.costCenter.delete({
-      where: { id },
-    });
+    return this.prisma.costCenter.delete({ where: { id } });
   }
 }

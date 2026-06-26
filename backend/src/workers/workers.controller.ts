@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Request } from '@nestjs/common';
 import { WorkersService } from './workers.service';
 import { CreateWorkerDto, UpdateWorkerDto } from './dto/worker.dto';
 import { Roles } from '../auth/decorators/roles.decorator';
@@ -9,13 +9,13 @@ export class WorkersController {
 
     @Post()
     @Roles('ADMIN', 'MANAGER', 'USER')
-    create(@Body() createWorkerDto: CreateWorkerDto) {
-        return this.workersService.create(createWorkerDto);
+    create(@Request() req, @Body() createWorkerDto: CreateWorkerDto) {
+        return this.workersService.create(createWorkerDto, req.user.tenantId);
     }
 
     @Get()
-    findAll() {
-        return this.workersService.findAll();
+    findAll(@Request() req) {
+        return this.workersService.findAll(req.user.tenantId);
     }
 
     @Get(':id')

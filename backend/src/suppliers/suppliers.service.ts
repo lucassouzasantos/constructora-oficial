@@ -7,36 +7,30 @@ import { PrismaService } from '../prisma.service';
 export class SuppliersService {
   constructor(private prisma: PrismaService) { }
 
-  create(createSupplierDto: CreateSupplierDto) {
+  create(createSupplierDto: CreateSupplierDto, tenantId: number) {
     return this.prisma.supplier.create({
-      data: createSupplierDto,
+      data: { ...createSupplierDto, tenantId },
     });
   }
 
-  findAll() {
+  findAll(tenantId: number) {
     return this.prisma.supplier.findMany({
+      where: { tenantId },
       orderBy: { name: 'asc' },
     });
   }
 
   findOne(id: number) {
-    return this.prisma.supplier.findUnique({
-      where: { id },
-    });
+    return this.prisma.supplier.findUnique({ where: { id } });
   }
 
   update(id: number, updateSupplierDto: UpdateSupplierDto) {
-    return this.prisma.supplier.update({
-      where: { id },
-      data: updateSupplierDto,
-    });
+    return this.prisma.supplier.update({ where: { id }, data: updateSupplierDto });
   }
 
   async remove(id: number) {
     try {
-      return await this.prisma.supplier.delete({
-        where: { id },
-      });
+      return await this.prisma.supplier.delete({ where: { id } });
     } catch (error) {
       if (error.code === 'P2003') {
         throw new ConflictException('Não é possível excluir fornecedor com transações vinculadas.');

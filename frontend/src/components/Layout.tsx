@@ -49,7 +49,12 @@ export default function Layout() {
                         <div className="w-10 h-10 bg-orange-500 rounded-lg flex items-center justify-center transform rotate-3">
                             <Building className="w-6 h-6 text-white" />
                         </div>
-                        <h1 className="text-xl md:text-2xl font-bold tracking-tight">Construtora<span className="text-orange-500">Sys</span></h1>
+                        <div>
+                            <h1 className="text-xl md:text-2xl font-bold tracking-tight">Construtora<span className="text-orange-500">Sys</span></h1>
+                            {user?.tenantName && (
+                                <p className="text-xs text-slate-400 truncate max-w-[160px]">{user.tenantName}</p>
+                            )}
+                        </div>
                     </div>
                     <button 
                         className="lg:hidden text-slate-400 hover:text-white"
